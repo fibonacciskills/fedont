@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Federation Loom</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Spline+Sans:wght@400;600&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ink:#0f1220;
+    --panel:#171b2d;
+    --panel2:#1e2340;
+    --line:#2b3155;
+    --line-soft:#232849;
+    --text:#eae7dc;
+    --muted:#9aa0b8;
+    --gold:#e2a84b;
+    --gold-dim:rgba(226,168,75,.16);
+    --good:#7fc98a;
+    --warn:#e0b458;
+    --bad:#d97f76;
+    --esco:#45c4b0; --onet:#e8756a; --ceds:#9a86e8; --schema:#5b9de8; --educor:#8fbf5f;
+    --display:"Bricolage Grotesque", Georgia, serif;
+    --body:"Spline Sans", -apple-system, "Segoe UI", sans-serif;
+    --mono:"Spline Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--ink); color:var(--text);
+    font-family:var(--body); font-size:15px; line-height:1.5;
+    overflow:hidden;
+  }
+  #app{height:100vh; display:flex; flex-direction:column}
+
+  /* ── top bar ─────────────────────────────── */
+  .topbar{
+    display:flex; align-items:center; gap:20px;
+    padding:10px 20px; border-bottom:1px solid var(--line-soft);
+    background:linear-gradient(180deg,#141830,#111527);
+    flex:0 0 auto;
+  }
+  .wordmark{
+    font-family:var(--display); font-weight:700; font-size:17px;
+    letter-spacing:.01em; white-space:nowrap;
+  }
+  .wordmark .thread{color:var(--gold)}
+  .act-tag{
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted);
+    border:1px solid var(--line); border-radius:3px; padding:3px 9px;
+    white-space:nowrap;
+  }
+  .hud{margin-left:auto; display:flex; align-items:center; gap:24px}
+  .hud-block{display:flex; flex-direction:column; gap:2px; min-width:88px}
+  .hud-label{
+    font-family:var(--mono); font-size:9.5px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--muted);
+  }
+  .hud-value{
+    font-family:var(--display); font-weight:700; font-size:22px;
+    line-height:1; font-variant-numeric:tabular-nums; position:relative;
+  }
+  .score-pop{
+    position:absolute; left:100%; top:0; margin-left:8px;
+    font-family:var(--mono); font-size:12px; color:var(--gold);
+    animation:pop 1.4s ease-out forwards; white-space:nowrap;
+  }
+  @keyframes pop{ 0%{opacity:0; transform:translateY(6px)} 15%{opacity:1} 100%{opacity:0; transform:translateY(-14px)} }
+  .richness{display:flex; flex-direction:column; gap:4px}
+  .meter{display:flex; gap:3px}
+  .meter i{
+    width:9px; height:14px; border-radius:2px;
+    background:var(--panel2); border:1px solid var(--line);
+    transition:background .5s, box-shadow .5s;
+  }
+  .meter i.lit{
+    background:var(--gold); border-color:var(--gold);
+    box-shadow:0 0 8px rgba(226,168,75,.55);
+  }
+
+  /* ── main split ──────────────────────────── */
+  main{flex:1; display:flex; min-height:0}
+  #stage{flex:1; position:relative; min-width:0}
+  #graph{position:absolute; inset:0; width:100%; height:100%; display:block}
+  .stage-hint{
+    position:absolute; left:16px; bottom:12px;
+    font-family:var(--mono); font-size:10.5px; color:#5c6280;
+    letter-spacing:.06em; pointer-events:none;
+  }
+
+  aside{
+    flex:0 0 410px; max-width:46vw;
+    border-left:1px solid var(--line-soft);
+    background:linear-gradient(180deg,#151931 0%, #12162a 100%);
+    overflow-y:auto; padding:22px;
+    display:flex; flex-direction:column; gap:16px;
+  }
+  @media (max-width:860px){
+    body{overflow:auto}
+    #app{height:auto; min-height:100vh}
+    main{flex-direction:column}
+    #stage{flex:0 0 46vh; min-height:340px}
+    aside{flex:1; max-width:none; border-left:none; border-top:1px solid var(--line-soft)}
+    .topbar{flex-wrap:wrap; gap:10px 14px}
+    .hud{gap:14px}
+  }
+
+  /* ── panel typography ────────────────────── */
+  .eyebrow{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--gold);
+  }
+  h2{
+    font-family:var(--display); font-weight:700; font-size:24px;
+    line-height:1.15; margin:4px 0 0; text-wrap:balance;
+  }
+  .lede{color:var(--muted); font-size:14px; margin:0}
+  .progress-dots{display:flex; gap:6px; margin-top:2px}
+  .progress-dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+  .progress-dots i.done{background:var(--gold)}
+  .progress-dots i.now{background:var(--text)}
+
+  /* ── cards ───────────────────────────────── */
+  .card{
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:8px; padding:14px 16px;
+  }
+  .concept-pair{display:flex; flex-direction:column; gap:8px}
+  .concept{
+    border:1px solid var(--line); border-left:3px solid var(--cl,var(--muted));
+    border-radius:6px; background:var(--panel); padding:10px 13px;
+  }
+  .concept .uri{
+    font-family:var(--mono); font-size:12.5px; font-weight:500;
+    color:var(--cl,var(--text)); word-break:break-all;
+  }
+  .concept .title{font-weight:600; font-size:15px; color:var(--cl,var(--text)); margin-top:2px}
+  .concept .def{font-size:13px; color:var(--muted); margin-top:3px}
+  .concept .scheme{
+    font-family:var(--mono); font-size:9.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted);
+  }
+  .link-mark{
+    text-align:center; font-family:var(--mono); font-size:11px;
+    color:var(--gold); letter-spacing:.1em;
+  }
+
+  /* ── buttons ─────────────────────────────── */
+  button{
+    font-family:var(--body); font-size:14px; color:var(--text);
+    background:var(--panel2); border:1px solid var(--line);
+    border-radius:6px; padding:10px 14px; cursor:pointer;
+    text-align:left; transition:border-color .15s, background .15s, transform .06s;
+    width:100%;
+  }
+  button:hover{border-color:var(--gold); background:#242a4d}
+  button:active{transform:translateY(1px)}
+  button:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+  button:disabled{opacity:.45; cursor:default}
+  button:disabled:hover{border-color:var(--line); background:var(--panel2)}
+  .btn-primary{
+    background:var(--gold); border-color:var(--gold); color:#241a08;
+    font-weight:600; text-align:center;
+  }
+  .btn-primary:hover{background:#eebb62; border-color:#eebb62}
+  .choice-list{display:flex; flex-direction:column; gap:8px}
+  .pred-btn{display:flex; flex-direction:column; gap:2px; padding:9px 13px}
+  .pred-name{font-family:var(--mono); font-size:13px; font-weight:500}
+  .opt-title{font-weight:600; font-size:14px; line-height:1.35}
+  .pred-gloss{font-size:12.5px; color:var(--muted)}
+  .pred-btn.picked-best{border-color:var(--good); background:rgba(127,201,138,.1)}
+  .pred-btn.picked-bad{border-color:var(--bad); background:rgba(217,127,118,.1)}
+  .pred-btn.reveal-best{border-color:var(--good)}
+
+  /* ── verdict / feedback ──────────────────── */
+  .verdict{
+    border-radius:8px; padding:12px 14px; font-size:13.5px;
+    border:1px solid var(--line); background:var(--panel);
+    display:flex; flex-direction:column; gap:8px;
+    animation:rise .3s ease-out;
+  }
+  @keyframes rise{from{opacity:0; transform:translateY(6px)} to{opacity:1}}
+  .verdict-head{font-family:var(--display); font-weight:700; font-size:15px}
+  .verdict.v-best .verdict-head{color:var(--good)}
+  .verdict.v-ok .verdict-head{color:var(--warn)}
+  .verdict.v-bad .verdict-head{color:var(--bad)}
+  .triple{
+    font-family:var(--mono); font-size:12px; line-height:1.7;
+    background:#10132244; border:1px solid var(--line-soft);
+    border-left:3px solid var(--gold);
+    border-radius:5px; padding:8px 12px; overflow-x:auto; white-space:pre;
+  }
+  .triple .p{color:var(--gold)}
+
+  /* ── end screen ──────────────────────────── */
+  .rank{
+    font-family:var(--display); font-weight:700; font-size:30px;
+    color:var(--gold); line-height:1.1; text-wrap:balance;
+  }
+  .takeaways{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:8px; font-size:13.5px}
+  .takeaways b{color:var(--gold); font-weight:600}
+  .breakdown{font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.9}
+  .breakdown b{color:var(--text); font-weight:500}
+  .credits{font-size:11.5px; color:#5c6280; line-height:1.7}
+  .credits a{color:#7d84a6}
+
+  /* ── intro overlay ───────────────────────── */
+  #overlay{
+    position:fixed; inset:0; z-index:10;
+    background:rgba(11,13,24,.82); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+    transition:opacity .5s;
+  }
+  #overlay.gone{opacity:0; pointer-events:none}
+  .intro{
+    max-width:520px; background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:34px 36px; display:flex; flex-direction:column; gap:14px;
+    box-shadow:0 30px 80px rgba(0,0,0,.5);
+  }
+  .intro h1{
+    font-family:var(--display); font-weight:700; font-size:40px;
+    line-height:1.02; margin:0; text-wrap:balance;
+  }
+  .intro h1 .thread{color:var(--gold)}
+  .intro p{margin:0; color:var(--muted); font-size:14.5px}
+  .intro .rules{
+    font-family:var(--mono); font-size:12px; color:var(--muted);
+    border-top:1px solid var(--line-soft); padding-top:12px; line-height:1.9;
+  }
+  .intro .rules b{color:var(--gold); font-weight:500}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important; transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="wordmark">The Federation <span class="thread">Loom</span></div>
+    <div class="act-tag" id="actTag">PROLOGUE</div>
+    <div class="hud">
+      <div class="hud-block richness">
+        <span class="hud-label">Questions answerable</span>
+        <div class="meter" id="meter"></div>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="scoreVal">0</span>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div id="stage">
+      <canvas id="graph"></canvas>
+      <div class="stage-hint">six vocabularies · one graph · gold = the links you weave · underlined = our focus standards</div>
+    </div>
+    <aside id="panel"></aside>
+  </main>
+</div>
+
+<div id="overlay">
+  <div class="intro">
+    <span class="eyebrow">An interactive field guide to federated ontologies</span>
+    <h1>The Federation <span class="thread">Loom</span></h1>
+    <p>Six real vocabularies describe the same world of learning and work — and none of them agree. They never will. Your job isn't to merge them. It's to <em>weave</em> them: one RDF link at a time, until six maps behave like a single living graph.</p>
+    <div class="rules">
+      <b>ACT I</b> &nbsp;Judge the joins — match concepts across vocabularies<br>
+      <b>ACT II</b> &nbsp;Run federated queries across your threads<br>
+      No login. Nothing saved. Just you and the loom.
+    </div>
+    <button class="btn-primary" id="beginBtn">Sit at the loom</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ════════════════════════ DATA ════════════════════════ */
+
+const CLUSTERS = {
+  esco:   { name:'ESCO',       full:'EU Skills, Competences & Occupations', color:'#45c4b0', angle:-90  },
+  onet:   { name:'O*NET',      full:'US Occupational Information Network',  color:'#e8756a', angle:-30  },
+  ceds:   { name:'CEDS',       full:'Common Education Data Standards',      color:'#9a86e8', angle:30, focus:true },
+  ctdl:   { name:'CTDL',       full:'Credential Transparency Description Language', color:'#e58bab', angle:90, focus:true },
+  schema: { name:'schema.org', full:'The web’s shared vocabulary',     color:'#5b9de8', angle:150 },
+  educor: { name:'EduCOR',     full:'Education & Career Recommendation',    color:'#8fbf5f', angle:210 },
+};
+
+const NODES = [
+  { id:'esco_dev',    c:'esco',   label:['software','developer'],      dx:0,   dy:-52 },
+  { id:'esco_python', c:'esco',   label:['Python'],                    dx:58,  dy:6   },
+  { id:'esco_skill',  c:'esco',   label:['Skill ⟨class⟩'],   dx:-58, dy:12  },
+  { id:'esco_dig',    c:'esco',   label:['digital literacy'],          dx:4,   dy:62, dim:true },
+  { id:'onet_dev',    c:'onet',   label:['15-1252 Software','Developers'], dx:2, dy:-46 },
+  { id:'onet_prog',   c:'onet',   label:['Programming'],               dx:52,  dy:26  },
+  { id:'onet_ds',     c:'onet',   label:['15-2051 Data','Scientists'], dx:-52, dy:30, dim:true },
+  { id:'ceds_fname',  c:'ceds',   label:['First Name'],                dx:0,   dy:-48 },
+  { id:'ceds_cred',   c:'ceds',   label:['Credential'],                dx:56,  dy:18  },
+  { id:'ceds_course', c:'ceds',   label:['Course Section'],            dx:-54, dy:22, dim:true },
+  { id:'sch_given',   c:'schema', label:['givenName'],                 dx:0,   dy:-52 },
+  { id:'sch_lr',      c:'schema', label:['LearningResource'],          dx:-58, dy:16 },
+  { id:'sch_person',  c:'schema', label:['Person'],                    dx:6,   dy:64, dim:true },
+  { id:'ctdl_cred',   c:'ctdl',   label:['Credential'],                dx:0,   dy:-44 },
+  { id:'ctdl_cert',   c:'ctdl',   label:['Certification'],             dx:-50, dy:22, dim:true },
+  { id:'ctdl_comp',   c:'ctdl',   label:['Competency'],                dx:48,  dy:24, dim:true },
+  { id:'edu_skill',   c:'educor', label:['Skill ⟨class⟩'],   dx:0,   dy:-46 },
+  { id:'edu_res',     c:'educor', label:['Educational','Resource'],    dx:56,  dy:20 },
+  { id:'edu_path',    c:'educor', label:['LearningPath'],              dx:-54, dy:24, dim:true },
+];
+
+const INTRA_EDGES = [
+  ['esco_dev','esco_python'],['esco_python','esco_skill'],['esco_skill','esco_dig'],['esco_dev','esco_skill'],
+  ['onet_dev','onet_prog'],['onet_prog','onet_ds'],
+  ['ceds_fname','ceds_cred'],['ceds_cred','ceds_course'],
+  ['sch_given','sch_lr'],['sch_lr','sch_person'],['sch_given','sch_person'],
+  ['ctdl_cred','ctdl_cert'],['ctdl_cred','ctdl_comp'],
+  ['edu_skill','edu_res'],['edu_res','edu_path'],['edu_skill','edu_path'],
+];
+
+const PREDS = {
+  exact:   { n:'skos:exactMatch',      g:'Same concept — interchangeable across schemes.' },
+  close:   { n:'skos:closeMatch',      g:'Similar enough for many apps, but not identical.' },
+  broad:   { n:'skos:broadMatch',      g:'The right-hand concept is broader — a parent.' },
+  narrow:  { n:'skos:narrowMatch',     g:'The right-hand concept is narrower — a child.' },
+  related: { n:'skos:relatedMatch',    g:'Associated, but neither equivalent nor hierarchical.' },
+  sameas:  { n:'owl:sameAs',           g:'These two IRIs are the very same individual thing.' },
+  eqclass: { n:'owl:equivalentClass',  g:'Every member of one class is a member of the other.' },
+  seealso: { n:'rdfs:seeAlso',         g:'“More info over there.” A hint with no formal meaning.' },
+};
+
+/* Act I — six joining rounds */
+const ROUNDS = [
+  { id:'r1', a:'ceds_fname', b:'sch_given', best:'exact',
+    scenario:'The university registrar must publish student profiles that the open web can read.',
+    src:{ t:'First name', d:'The legal first name of a person, as the registrar records it.' },
+    opts:[
+      { t:'Given name',        d:'How the web says “first name” on a person’s profile.', ok:true },
+      { t:'Person',            d:'The whole human — not one of their fields.' },
+      { t:'Learning resource', d:'Something you study — not a name at all.' },
+    ],
+    thread:'The name thread — the registrar’s “first name” joined to the web’s “given name”',
+    pair:'CEDS ↔ schema.org',
+    triple:'ceds:FirstName skos:exactMatch schema:givenName .',
+    why:'“First name” and “given name” are the same idea wearing two communities’ clothes, so the loom records the join as skos:exactMatch — interchangeable. Every registrar transcript can now feed a web-readable profile.' },
+  { id:'r2', a:'esco_dev', b:'onet_dev', best:'close',
+    scenario:'Ana’s CV is coded the EU way. US job listings describe jobs the US way.',
+    src:{ t:'Software developer', d:'Develops and implements software — as defined for 27 EU labour markets.' },
+    opts:[
+      { t:'“Software Developers” — the US occupation', d:'The matching US job, with US wage and outlook data.', ok:true },
+      { t:'Programming — the skill',                   d:'Writing computer programs. A skill, not an occupation.' },
+      { t:'“Data Scientists” — the US occupation',     d:'A neighbouring but different job.' },
+    ],
+    thread:'The occupation thread — the EU’s “software developer” joined to the US “Software Developers”',
+    pair:'ESCO ↔ O*NET',
+    triple:'esco:softwareDeveloper skos:closeMatch onetsoc:15-1252.00 .',
+    why:'This is a real, published crosswalk: ESCO maps its developer occupation to O*NET-SOC 15-1252.00 as a close match — the two definitions were written for different labour markets, so “close, not exact” is the honest claim. Ana’s CV just became legible in Washington.' },
+  { id:'r3', a:'esco_python', b:'onet_prog', best:'broad',
+    scenario:'An employer’s posting asks for general skills. A candidate’s profile lists specific ones.',
+    src:{ t:'Python', d:'The ability to write computer programs in the Python language.' },
+    opts:[
+      { t:'Programming',                        d:'Writing computer programs in any language — the broader skill.', ok:true },
+      { t:'“Software Developers” — the US job', d:'A job that uses the skill — not the skill itself.' },
+      { t:'“Data Scientists” — the US job',     d:'Also a job, not a skill.' },
+    ],
+    thread:'The skill-ladder thread — “Python” joined up to the broader “Programming”',
+    pair:'ESCO ↔ O*NET',
+    triple:'esco:python skos:broadMatch onet:Programming .',
+    why:'Python is one way to program, so it joins upward to the broader concept — the loom records skos:broadMatch, read as “Python ⊆ Programming.” Specific skills connecting to general demand is exactly how CVs meet job ads.' },
+  { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'close',
+    scenario:'Maria’s diploma lives in the registrar’s records. The public credential registry describes credentials so the whole market can trust and compare them.',
+    src:{ t:'Credential', d:'A qualification awarded by an education institution — with US reporting fields.' },
+    opts:[
+      { t:'Credential — as the registry describes it', d:'A degree, badge or certificate, published for transparency and comparison.', ok:true },
+      { t:'Certification',                             d:'One kind of credential, awarded by industry bodies — not the whole class.' },
+      { t:'Competency',                                d:'What a credential attests — not the credential itself.' },
+    ],
+    thread:'The credential thread — the registrar’s credential joined to the credential registry’s',
+    pair:'CEDS ↔ CTDL',
+    triple:'ceds:Credential skos:closeMatch ceterms:Credential .',
+    why:'CEDS models credentials for education agencies; CTDL — the Credential Transparency Description Language — models them so employers and learners can compare and trust them. The loom joins the near-twins as a close match, and a diploma can now answer the open market’s questions.' },
+  { id:'r5', a:'edu_skill', b:'esco_skill', best:'close',
+    scenario:'The learning platform wants its recommendations to track real labour-market demand.',
+    src:{ t:'Skill — as the platform tracks it', d:'A learner’s ability, tracked to recommend what to learn next.' },
+    opts:[
+      { t:'Skill — the EU’s canonical class', d:'The ability to apply knowledge to complete tasks — where labour-market demand lives.', ok:true },
+      { t:'Software developer',               d:'An occupation that uses skills — not the idea of a skill.' },
+      { t:'Python',                           d:'One particular skill — not the class of all skills.' },
+    ],
+    thread:'The skill-alignment thread — the platform’s idea of a skill joined to the EU’s',
+    pair:'EduCOR ↔ ESCO',
+    triple:'educor:Skill skos:closeMatch esco:Skill .',
+    why:'EduCOR deliberately anchors its Skill class to ESCO — that link to the labour market is the ontology’s selling point — while keeping its own machinery for recommendations. The loom records skos:closeMatch: aligned, not fused.' },
+  { id:'r6', a:'edu_res', b:'sch_lr', best:'exact',
+    scenario:'The platform’s courses should be findable by anything that reads the open web.',
+    src:{ t:'Educational resource', d:'Any resource a learner can study — video, article, exercise.' },
+    opts:[
+      { t:'Learning resource',                     d:'Anything persistent that carries learning value — the web’s term.', ok:true },
+      { t:'Educational / occupational credential', d:'What you earn at the end — not what you study.' },
+      { t:'Person',                                d:'The learner — not the material.' },
+    ],
+    thread:'The resource thread — the platform’s study material joined to the web’s',
+    pair:'EduCOR ↔ schema.org',
+    triple:'educor:EducationalResource skos:exactMatch\n    schema:LearningResource .',
+    why:'EduCOR was built on LRMI and schema.org, so here the concepts genuinely coincide — the loom records skos:exactMatch. Every resource on the platform is now visible to anything that speaks schema.org.' },
+];
+
+/* Act II — three federated queries */
+const QUERIES = [
+  { need:'r4',
+    title:'The diploma that crosses the wall',
+    text:'Maria’s diploma lives in the registrar’s records. An employer checks credentials against the public credential registry. <b>Which of your threads lets one query prove her diploma is the real thing?</b>',
+    path:['ceds_course','ceds_cred','ctdl_cred'],
+    why:'The query hops: her course section → the CEDS credential it earned → across your skos:closeMatch thread → the CTDL credential the registry publishes. Neither the registrar nor the registry changed a single field.' },
+  { need:'r2',
+    title:'A CV emigrates',
+    text:'Ana’s CV is coded the EU way. She’s searching a US job board that describes jobs the US way. <b>Which thread lets her profile match the US listings?</b>',
+    path:['esco_python','esco_dev','onet_dev'],
+    why:'Her Python skill supports her ESCO occupation, and your closeMatch thread carries the query into O*NET’s 15-1252.00 — where the US listings live. One link, two labour markets, zero schema changes.' },
+  { need:'r5',
+    title:'The recommender looks outward',
+    text:'A learning platform wants to recommend a course teaching a skill that <em>EU employers</em> are asking for — demand data the platform itself doesn’t track. <b>Which thread powers the recommendation?</b>',
+    path:['edu_path','edu_skill','esco_skill'],
+    why:'The learning path names an EduCOR skill; your thread aligns it with ESCO’s skill, where labour-market demand lives. The recommender just got smarter without adding one field to its own ontology.' },
+];
+
+const RANKS = [
+  [0,   'Silo Dweller',        'Your data is safe. Also alone. Weave again?'],
+  [300, 'Crosswalk Apprentice','You can see the bridges now. The precision comes with practice.'],
+  [600, 'Linked-Data Weaver',  'Your threads hold weight. Query engines trust you.'],
+  [800, 'Federation Architect','Six vocabularies, one living graph. The loom is yours.'],
+];
+
+/* ════════════════════════ STATE ════════════════════════ */
+
+const S = {
+  screen:'intro',
+  score:0, shownScore:0,
+  richness:0,           // out of 12
+  roundIdx:0, act2Score:0, bestCount:0,
+  queryIdx:0, act3Score:0, queryRight:0,
+  links:[],             // {a,b,pred,born}
+  pulse:null,           // {path:[ids], t0}
+};
+
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ════════════════════════ HUD ════════════════════════ */
+
+const scoreEl = document.getElementById('scoreVal');
+const meterEl = document.getElementById('meter');
+const actTag  = document.getElementById('actTag');
+for (let i=0;i<12;i++) meterEl.appendChild(document.createElement('i'));
+
+function addScore(pts){
+  if (pts<=0) return;
+  S.score += pts;
+  const pop = document.createElement('span');
+  pop.className='score-pop'; pop.textContent='+'+pts;
+  scoreEl.appendChild(pop);
+  setTimeout(()=>pop.remove(), 1500);
+}
+function addRichness(n){
+  S.richness = Math.min(12, S.richness+n);
+  [...meterEl.children].forEach((seg,i)=> seg.classList.toggle('lit', i<S.richness));
+}
+
+/* ════════════════════════ CANVAS ════════════════════════ */
+
+const cv = document.getElementById('graph');
+const cx = cv.getContext('2d');
+const nodeById = Object.fromEntries(NODES.map(n=>[n.id,n]));
+
+function clusterCenter(key, w, h){
+  const a = CLUSTERS[key].angle * Math.PI/180;
+  return { x: w/2 + Math.cos(a)*w*0.335, y: h/2 + Math.sin(a)*h*0.33 };
+}
+function nodePos(n, w, h, t){
+  const c = clusterCenter(n.c, w, h);
+  const s = Math.min(w,h)/640;
+  const wob = REDUCED ? 0 : 3.2;
+  const ph = n.id.length*1.7;
+  return {
+    x: c.x + n.dx*s + Math.sin(t*0.0007+ph)*wob,
+    y: c.y + n.dy*s + Math.cos(t*0.0009+ph*1.3)*wob,
+  };
+}
+
+function draw(t){
+  const dpr = devicePixelRatio||1;
+  const w = cv.clientWidth, h = cv.clientHeight;
+  if (!w||!h) return;
+  if (cv.width!==w*dpr||cv.height!==h*dpr){ cv.width=w*dpr; cv.height=h*dpr; }
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  cx.clearRect(0,0,w,h);
+
+  const pos = {};
+  NODES.forEach(n=> pos[n.id]=nodePos(n,w,h,t));
+
+  /* cluster glows + names */
+  for (const key in CLUSTERS){
+    const c = clusterCenter(key,w,h), col = CLUSTERS[key].color;
+    const r = Math.min(w,h)*0.19;
+    const g = cx.createRadialGradient(c.x,c.y,0,c.x,c.y,r);
+    g.addColorStop(0, col+'16'); g.addColorStop(1, col+'00');
+    cx.fillStyle=g; cx.beginPath(); cx.arc(c.x,c.y,r,0,7); cx.fill();
+    cx.font='600 11px "Spline Sans Mono", monospace';
+    cx.textAlign='center'; cx.fillStyle=col+'cc';
+    const ly = c.y + (c.y < h/2 ? -Math.min(w,h)*0.155 : Math.min(w,h)*0.165);
+    cx.fillText(CLUSTERS[key].name.toUpperCase(), c.x, ly);
+    if (CLUSTERS[key].focus){
+      const tw = cx.measureText(CLUSTERS[key].name.toUpperCase()).width;
+      cx.strokeStyle='#e2a84b'; cx.lineWidth=1.4;
+      cx.beginPath(); cx.moveTo(c.x-tw/2, ly+4); cx.lineTo(c.x+tw/2, ly+4); cx.stroke();
+    }
+    cx.font='400 9px "Spline Sans Mono", monospace'; cx.fillStyle='#6a7092';
+    cx.fillText(CLUSTERS[key].full, c.x, ly+13);
+  }
+
+  /* intra-cluster edges */
+  cx.lineWidth=1;
+  INTRA_EDGES.forEach(([a,b])=>{
+    const pa=pos[a], pb=pos[b];
+    cx.strokeStyle = CLUSTERS[nodeById[a].c].color+'38';
+    cx.beginPath(); cx.moveTo(pa.x,pa.y); cx.lineTo(pb.x,pb.y); cx.stroke();
+  });
+
+  /* gold federation links */
+  S.links.forEach(L=>{
+    const pa=pos[L.a], pb=pos[L.b];
+    const age = Math.min(1,(t-L.born)/900);
+    const mx=(pa.x+pb.x)/2, my=(pa.y+pb.y)/2;
+    const dx=pb.x-pa.x, dy=pb.y-pa.y, len=Math.hypot(dx,dy)||1;
+    const bow = Math.min(46, len*0.16);
+    const cxp = mx - dy/len*bow, cyp = my + dx/len*bow;
+    cx.save();
+    cx.strokeStyle='#e2a84b';
+    cx.globalAlpha = 0.35 + 0.55*age;
+    cx.lineWidth = 1.6;
+    cx.shadowColor='rgba(226,168,75,.7)'; cx.shadowBlur = 7+5*age;
+    cx.setLineDash([7,5]);
+    cx.lineDashOffset = REDUCED ? 0 : -t*0.02;
+    cx.beginPath(); cx.moveTo(pa.x,pa.y); cx.quadraticCurveTo(cxp,cyp,pb.x,pb.y); cx.stroke();
+    cx.restore();
+    /* predicate label */
+    const lx = 0.25*pa.x+0.5*cxp+0.25*pb.x, ly = 0.25*pa.y+0.5*cyp+0.25*pb.y;
+    cx.font='400 9px "Spline Sans Mono", monospace';
+    const tw = cx.measureText(L.pred).width;
+    cx.fillStyle='rgba(15,18,32,.85)';
+    cx.fillRect(lx-tw/2-4, ly-7, tw+8, 13);
+    cx.fillStyle='#e2a84b'; cx.textAlign='center';
+    cx.fillText(L.pred, lx, ly+3);
+  });
+
+  /* query pulse */
+  if (S.pulse && !REDUCED){
+    const el = (t - S.pulse.t0)/1600;          // one hop per 1.6s
+    const total = S.pulse.path.length-1;
+    const prog = el % (total+0.6);
+    if ((t - S.pulse.t0) > 1600*(total+0.6)*2) S.pulse=null;
+    else if (prog<total){
+      const i = Math.floor(prog), f = prog-i;
+      const pa = pos[S.pulse.path[i]], pb = pos[S.pulse.path[i+1]];
+      const px = pa.x+(pb.x-pa.x)*f, py = pa.y+(pb.y-pa.y)*f;
+      cx.save();
+      cx.fillStyle='#fff0d0'; cx.shadowColor='#e2a84b'; cx.shadowBlur=16;
+      cx.beginPath(); cx.arc(px,py,4.5,0,7); cx.fill();
+      cx.restore();
+    }
+  }
+  const pulsePath = S.pulse ? S.pulse.path : null;
+
+  /* nodes */
+  NODES.forEach(n=>{
+    const p=pos[n.id], col=CLUSTERS[n.c].color;
+    const hot = pulsePath && pulsePath.includes(n.id);
+    const linked = S.links.some(L=>L.a===n.id||L.b===n.id);
+    const R = n.dim?4.5:6;
+    cx.save();
+    if (linked||hot){ cx.shadowColor = hot?'#e2a84b':col; cx.shadowBlur=10; }
+    cx.fillStyle='#171b2d';
+    cx.strokeStyle = hot ? '#e2a84b' : col + (n.dim?'77':'ee');
+    cx.lineWidth = linked?2:1.4;
+    cx.beginPath(); cx.arc(p.x,p.y,R,0,7); cx.fill(); cx.stroke();
+    if (linked){ cx.fillStyle='#e2a84b'; cx.beginPath(); cx.arc(p.x,p.y,2.2,0,7); cx.fill(); }
+    cx.restore();
+    cx.font='400 10px "Spline Sans Mono", monospace';
+    cx.textAlign='center';
+    cx.fillStyle = n.dim ? '#585e7d' : '#c9cddd';
+    n.label.forEach((line,i)=> cx.fillText(line, p.x, p.y+R+11+i*11));
+  });
+
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+/* score tween */
+(function tickScore(){
+  const d = S.score - S.shownScore;
+  if (d!==0) S.shownScore += Math.sign(d)*Math.max(1,Math.ceil(Math.abs(d)/12));
+  scoreEl.firstChild ? scoreEl.firstChild.nodeValue = S.shownScore : scoreEl.textContent = S.shownScore;
+  requestAnimationFrame(tickScore);
+})();
+
+/* ════════════════════════ PANEL RENDERING ════════════════════════ */
+
+const panel = document.getElementById('panel');
+const esc = s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+function dots(total, idx){
+  let h='<div class="progress-dots">';
+  for(let i=0;i<total;i++) h+=`<i class="${i<idx?'done':i===idx?'now':''}"></i>`;
+  return h+'</div>';
+}
+
+/* ── PROLOGUE ── */
+function renderPrologue(){
+  actTag.textContent='PROLOGUE';
+  panel.innerHTML = `
+    <div>
+      <span class="eyebrow">Prologue · Why six maps?</span>
+      <h2>One territory. Six maps. Forever.</h2>
+      <p class="lede">Each vocabulary on the graph was drawn by a different community, to answer that community’s own questions. The registrar (<b style="color:var(--ceds)">CEDS</b>) asks “did Maria earn the credits?” The public credential registry (<b style="color:#e58bab">CTDL</b>) asks “can an employer trust what her diploma claims?” The EU labour ministry (ESCO) asks “does her CV match a vacancy in Warsaw?” Those two underlined on the graph — CEDS and CTDL — are the standards this loom is really about.</p>
+    </div>
+    <div class="card" style="font-size:13.5px; color:var(--muted)">
+      A single merged mega-ontology would have to answer <em>everyone’s</em> questions — which is how it ends up answering no one’s. Multiple ontologies aren’t a failure of coordination; they’re fitness. They will always exist.
+      <div style="margin-top:8px; color:var(--text)">But RDF lets separate vocabularies point at each other. One small link — <span style="font-family:var(--mono); color:var(--gold)">this concept joins that one</span> — and questions start flowing across the walls.</div>
+    </div>
+    <div class="card">
+      <span class="eyebrow" style="display:block; margin-bottom:8px">How to play</span>
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px">
+        <div><b>Act I · The Weave.</b> You’re shown a concept from one vocabulary. Pick the concept it joins to in another. Every join weaves a gold thread onto the graph (+100) and lights up the “questions answerable” meter.</div>
+        <div><b>Act II · The Harvest.</b> Three federated queries travel your threads. Send each one down the right thread (+100) and watch it cross the graph.</div>
+      </div>
+    </div>
+    <button class="btn-primary" id="toAct1">Pick up the golden thread → Act I</button>`;
+  document.getElementById('toAct1').addEventListener('click', ()=>{ S.roundIdx=0; renderAct2(); });
+}
+
+/* ── ACT I · THE WEAVE ── */
+function renderAct2(){
+  actTag.textContent='ACT I · THE WEAVE';
+  const r = ROUNDS[S.roundIdx];
+  const cs = CLUSTERS[nodeById[r.a].c], ct = CLUSTERS[nodeById[r.b].c];
+  const order = [0,1,2].map(j=>(j+S.roundIdx)%3);
+  panel.innerHTML = `
+    <div>
+      <span class="eyebrow">Act I · The weave</span>
+      <h2>Where does this join?</h2>
+      <p class="lede">${r.scenario}</p>
+      ${dots(ROUNDS.length, S.roundIdx)}
+    </div>
+    <div class="concept" style="--cl:${cs.color}">
+      <span class="scheme">${cs.name}</span>
+      <div class="title">${r.src.t}</div>
+      <div class="def">${r.src.d}</div>
+    </div>
+    <div class="link-mark">—— joins which ${ct.name} concept? ——</div>
+    <div class="choice-list">
+      ${order.map(i=>{ const o=r.opts[i]; return `
+        <button class="pred-btn" data-i="${i}" style="border-left:3px solid ${ct.color}66">
+          <span class="opt-title" style="color:${ct.color}">${o.t}</span>
+          <span class="pred-gloss">${o.d}</span>
+        </button>`; }).join('')}
+    </div>
+    <div id="fb"></div>`;
+  panel.querySelectorAll('[data-i]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const right = !!r.opts[+btn.dataset.i].ok;
+      panel.querySelectorAll('[data-i]').forEach(b=>{
+        b.disabled=true;
+        if (r.opts[+b.dataset.i].ok) b.classList.add(right?'picked-best':'reveal-best');
+        else if (b===btn) b.classList.add('picked-bad');
+      });
+      if (right){ addScore(100); S.act2Score+=100; S.bestCount++; }
+      /* the loom always weaves the TRUE join, so the graph stays sound */
+      S.links.push({ a:r.a, b:r.b, pred:PREDS[r.best].n, born:performance.now(), round:r.id });
+      addRichness(2);
+      const last = S.roundIdx===ROUNDS.length-1;
+      document.getElementById('fb').innerHTML = `
+        <div class="verdict ${right?'v-best':'v-bad'}">
+          <span class="verdict-head">${right?'Joined. +100':'Not that one — the loom weaves the true join.'}</span>
+          <div class="triple">${esc(r.triple).replace(/skos:\w+|owl:\w+/g, m=>'<span class="p">'+m+'</span>')}</div>
+          <span>${r.why}</span>
+          <span style="color:var(--muted); font-size:12.5px">Watch the gold thread appear on the graph. Questions answerable: <b style="color:var(--gold)">+2</b>.</span>
+          <button class="btn-primary" id="next">${last?'The graph is woven → Act II':'Next join'}</button>
+        </div>`;
+      document.getElementById('fb').scrollIntoView({behavior:REDUCED?'auto':'smooth', block:'end'});
+      document.getElementById('next').addEventListener('click', ()=>{
+        if (last){ S.queryIdx=0; renderAct3(); }
+        else { S.roundIdx++; renderAct2(); }
+      });
+    });
+  });
+}
+
+/* ── ACT II · THE HARVEST ── */
+function renderAct3(){
+  actTag.textContent='ACT II · THE HARVEST';
+  const q = QUERIES[S.queryIdx];
+  /* option bridges: correct + 2 decoys, shuffled deterministically enough */
+  const decoys = ROUNDS.filter(r=>r.id!==q.need);
+  const opts = [ROUNDS.find(r=>r.id===q.need), decoys[(S.queryIdx*2)%decoys.length], decoys[(S.queryIdx*2+3)%decoys.length]]
+    .sort((a,b)=> a.ua<b.ua?-1:1);
+  panel.innerHTML = `
+    <div>
+      <span class="eyebrow">Act II · The harvest</span>
+      <h2>${q.title}</h2>
+      <p class="lede">Federated queries travel your threads. Send this one down the right thread.</p>
+      ${dots(QUERIES.length, S.queryIdx)}
+    </div>
+    <div class="card" style="font-size:14px">${q.text}</div>
+    <div class="choice-list">
+      ${opts.map(r=>`
+        <button class="pred-btn" data-r="${r.id}">
+          <span class="opt-title" style="color:var(--gold)">${r.thread}</span>
+          <span class="pred-gloss">${r.pair}</span>
+        </button>`).join('')}
+    </div>
+    <div id="fb"></div>`;
+  panel.querySelectorAll('[data-r]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const right = btn.dataset.r===q.need;
+      panel.querySelectorAll('[data-r]').forEach(b=>{
+        b.disabled=true;
+        if (b.dataset.r===q.need) b.classList.add('picked-best');
+        else if (b===btn) b.classList.add('picked-bad');
+      });
+      if (right){ addScore(100); S.act3Score+=100; S.queryRight++; }
+      S.pulse = { path:q.path, t0:performance.now() };
+      const last = S.queryIdx===QUERIES.length-1;
+      document.getElementById('fb').innerHTML = `
+        <div class="verdict ${right?'v-best':'v-bad'}">
+          <span class="verdict-head">${right?'The query lands. +100':'It took a different thread — watch the graph.'}</span>
+          <span>${q.why}</span>
+          <button class="btn-primary" id="next">${last?'Read the loom’s verdict':'Next query'}</button>
+        </div>`;
+      document.getElementById('fb').scrollIntoView({behavior:REDUCED?'auto':'smooth', block:'end'});
+      document.getElementById('next').addEventListener('click', ()=>{
+        if (last) renderEnd();
+        else { S.queryIdx++; renderAct3(); }
+      });
+    });
+  });
+}
+
+/* ── END ── */
+function renderEnd(){
+  actTag.textContent='EPILOGUE';
+  let rank=RANKS[0];
+  RANKS.forEach(r=>{ if (S.score>=r[0]) rank=r; });
+  panel.innerHTML = `
+    <div>
+      <span class="eyebrow">The loom’s verdict · ${S.score} points</span>
+      <div class="rank">${rank[1]}</div>
+      <p class="lede">${rank[2]}</p>
+    </div>
+    <div class="card breakdown">
+      Act I · weaving <b>${S.act2Score}</b> (${S.bestCount}/6 true joins)<br>
+      Act II · queries <b>${S.act3Score}</b> (${S.queryRight}/3)
+    </div>
+    <div class="card">
+      <span class="eyebrow" style="display:block; margin-bottom:8px">What the loom teaches</span>
+      <ul class="takeaways">
+        <li>Ontologies are <b>local by design</b> — each answers its own community’s questions. That’s fitness, not fragmentation.</li>
+        <li>They will <b>never collapse into one</b>. Every merge committee rediscovers this the slow way.</li>
+        <li><b>RDF links</b> — skos:exactMatch, closeMatch, broadMatch — let separate vocabularies behave like one living graph, each claim saying exactly as much as is true.</li>
+        <li>Every thread you wove made <b>new questions answerable</b> — and nobody had to change their schema.</li>
+      </ul>
+    </div>
+    <button class="btn-primary" id="again">Weave again</button>
+    <p class="credits">Grounded in real vocabularies: <a href="https://esco.ec.europa.eu/" target="_blank" rel="noopener">ESCO</a> · <a href="https://www.onetonline.org/" target="_blank" rel="noopener">O*NET</a> · <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · <a href="https://arxiv.org/abs/2107.05522" target="_blank" rel="noopener">EduCOR</a>, linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a>. The ESCO↔O*NET closeMatch crosswalk is real and published. Nothing here is saved — close the tab and the loom forgets you.</p>`;
+  document.getElementById('again').addEventListener('click', ()=>{
+    Object.assign(S, { score:0, shownScore:0, richness:0,
+      roundIdx:0, act2Score:0, bestCount:0, queryIdx:0, act3Score:0, queryRight:0,
+      links:[], pulse:null });
+    [...meterEl.children].forEach(seg=>seg.classList.remove('lit'));
+    renderAct2();
+  });
+}
+
+/* ── intro ── */
+panel.innerHTML = `
+  <div>
+    <span class="eyebrow">Prologue</span>
+    <h2>Five maps of one territory</h2>
+    <p class="lede">The graph beside you shows six real vocabularies that describe learning and work — with CEDS and CTDL, the credential standards, underlined in gold. Right now, nothing connects them — a question asked in one cannot be answered by another.</p>
+  </div>
+  <div class="card" style="color:var(--muted); font-size:13.5px">Press <b style="color:var(--text)">Sit at the loom</b> to begin.</div>`;
+
+document.getElementById('beginBtn').addEventListener('click', ()=>{
+  document.getElementById('overlay').classList.add('gone');
+  renderPrologue();
+});
+</script>
+</body>
+</html>

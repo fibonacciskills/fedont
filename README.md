@@ -4,7 +4,8 @@ An interactive, scored game that teaches federated ontologies: multiple ontologi
 always exist — and that's healthy — but RDF links (SKOS/OWL) let them behave like one
 living, richer graph.
 
-Play in two acts across five real vocabularies (ESCO, O*NET, CEDS, schema.org, EduCOR):
+Play in two acts across five real US-focused vocabularies — CEDS and CTDL (the focus
+standards, underlined in gold on the graph) plus O*NET, schema.org, and EduCOR:
 
 - **Prologue.** A brief read on why multiple ontologies exist (and always will), and how to play.
 - **Act I — The Weave.** Judge which concept in another vocabulary each concept joins to;
@@ -12,7 +13,8 @@ Play in two acts across five real vocabularies (ESCO, O*NET, CEDS, schema.org, E
   `broadMatch`) on the graph.
 - **Act II — The Harvest.** Run federated queries that only work across the links you wove.
 
-No login, no persistence — score lives only in the tab.
+The first play is a quick game (3 joins, 2 queries); the expanded loom (6 joins, 3 queries)
+unlocks from the score screen. No login, no persistence — score lives only in the tab.
 
 ## Run it
 
@@ -34,7 +36,7 @@ then Settings → Pages → deploy from the `main` branch root.
 
 ## Grounded in
 
-[ESCO](https://esco.ec.europa.eu/) · [O*NET](https://www.onetonline.org/) ·
-[CEDS](https://ceds.ed.gov/) · [schema.org](https://schema.org/) ·
+[CEDS](https://ceds.ed.gov/) · [CTDL](https://credreg.net/) ·
+[O*NET](https://www.onetonline.org/) · [schema.org](https://schema.org/) ·
 [EduCOR](https://arxiv.org/abs/2107.05522) · [SKOS](https://www.w3.org/TR/skos-reference/).
-The ESCO↔O*NET `skos:closeMatch` crosswalk in Act II is a real, published mapping.
+The CIP→SOC program-to-occupation crosswalk in the game is real, published by NCES.

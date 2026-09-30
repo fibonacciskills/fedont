@@ -21,7 +21,7 @@
     --good:#7fc98a;
     --warn:#e0b458;
     --bad:#d97f76;
-    --esco:#45c4b0; --onet:#e8756a; --ceds:#9a86e8; --schema:#5b9de8; --educor:#8fbf5f;
+    --onet:#e8756a; --ceds:#9a86e8; --ctdl:#e58bab; --schema:#5b9de8; --educor:#8fbf5f;
     --display:"Bricolage Grotesque", Georgia, serif;
     --body:"Spline Sans", -apple-system, "Segoe UI", sans-serif;
     --mono:"Spline Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -257,7 +257,7 @@
   <main>
     <div id="stage">
       <canvas id="graph"></canvas>
-      <div class="stage-hint">six vocabularies · one graph · gold = the links you weave · underlined = our focus standards</div>
+      <div class="stage-hint">five vocabularies · one graph · gold = the links you weave · underlined = our focus standards</div>
     </div>
     <aside id="panel"></aside>
   </main>
@@ -267,7 +267,7 @@
   <div class="intro">
     <span class="eyebrow">An interactive field guide to federated ontologies</span>
     <h1>The Federation <span class="thread">Loom</span></h1>
-    <p>Six real vocabularies describe the same world of learning and work — and none of them agree. They never will. Your job isn't to merge them. It's to <em>weave</em> them: one RDF link at a time, until six maps behave like a single living graph.</p>
+    <p>Five real vocabularies describe the same world of learning and work — and none of them agree. They never will. Your job isn't to merge them. It's to <em>weave</em> them: one RDF link at a time, until five maps behave like a single living graph.</p>
     <div class="rules">
       <b>ACT I</b> &nbsp;Judge the joins — match concepts across vocabularies<br>
       <b>ACT II</b> &nbsp;Run federated queries across your threads<br>
@@ -282,43 +282,39 @@
 /* ════════════════════════ DATA ════════════════════════ */
 
 const CLUSTERS = {
-  esco:   { name:'ESCO',       full:'EU Skills, Competences & Occupations', color:'#45c4b0', angle:-90  },
-  onet:   { name:'O*NET',      full:'US Occupational Information Network',  color:'#e8756a', angle:-30  },
-  ceds:   { name:'CEDS',       full:'Common Education Data Standards',      color:'#9a86e8', angle:30, focus:true },
-  ctdl:   { name:'CTDL',       full:'Credential Transparency Description Language', color:'#e58bab', angle:90, focus:true },
-  schema: { name:'schema.org', full:'The web’s shared vocabulary',     color:'#5b9de8', angle:150 },
-  educor: { name:'EduCOR',     full:'Education & Career Recommendation',    color:'#8fbf5f', angle:210 },
+  onet:   { name:'O*NET',      full:'US Occupational Information Network',  color:'#e8756a', angle:-90  },
+  ceds:   { name:'CEDS',       full:'Common Education Data Standards',      color:'#9a86e8', angle:-18, focus:true },
+  ctdl:   { name:'CTDL',       full:'Credential Transparency Description Language', color:'#e58bab', angle:54, focus:true },
+  schema: { name:'schema.org', full:'The web’s shared vocabulary',     color:'#5b9de8', angle:126 },
+  educor: { name:'EduCOR',     full:'Education & Career Recommendation',    color:'#8fbf5f', angle:198 },
 };
 
 const NODES = [
-  { id:'esco_dev',    c:'esco',   label:['software','developer'],      dx:0,   dy:-52 },
-  { id:'esco_python', c:'esco',   label:['Python'],                    dx:58,  dy:6   },
-  { id:'esco_skill',  c:'esco',   label:['Skill ⟨class⟩'],   dx:-58, dy:12  },
-  { id:'esco_dig',    c:'esco',   label:['digital literacy'],          dx:4,   dy:62, dim:true },
   { id:'onet_dev',    c:'onet',   label:['15-1252 Software','Developers'], dx:2, dy:-46 },
   { id:'onet_prog',   c:'onet',   label:['Programming'],               dx:52,  dy:26  },
   { id:'onet_ds',     c:'onet',   label:['15-2051 Data','Scientists'], dx:-52, dy:30, dim:true },
   { id:'ceds_fname',  c:'ceds',   label:['First Name'],                dx:0,   dy:-48 },
-  { id:'ceds_cred',   c:'ceds',   label:['Credential'],                dx:56,  dy:18  },
-  { id:'ceds_course', c:'ceds',   label:['Course Section'],            dx:-54, dy:22, dim:true },
+  { id:'ceds_cred',   c:'ceds',   label:['Credential'],                dx:54,  dy:14  },
+  { id:'ceds_cip',    c:'ceds',   label:['CS Program','(CIP 11.0701)'],dx:-54, dy:18  },
+  { id:'ceds_course', c:'ceds',   label:['Course Section'],            dx:2,   dy:60, dim:true },
+  { id:'ctdl_cred',   c:'ctdl',   label:['Credential'],                dx:0,   dy:-44 },
+  { id:'ctdl_comp',   c:'ctdl',   label:['Competency'],                dx:48,  dy:24 },
+  { id:'ctdl_cert',   c:'ctdl',   label:['Certification'],             dx:-50, dy:22, dim:true },
   { id:'sch_given',   c:'schema', label:['givenName'],                 dx:0,   dy:-52 },
   { id:'sch_lr',      c:'schema', label:['LearningResource'],          dx:-58, dy:16 },
   { id:'sch_person',  c:'schema', label:['Person'],                    dx:6,   dy:64, dim:true },
-  { id:'ctdl_cred',   c:'ctdl',   label:['Credential'],                dx:0,   dy:-44 },
-  { id:'ctdl_cert',   c:'ctdl',   label:['Certification'],             dx:-50, dy:22, dim:true },
-  { id:'ctdl_comp',   c:'ctdl',   label:['Competency'],                dx:48,  dy:24, dim:true },
   { id:'edu_skill',   c:'educor', label:['Skill ⟨class⟩'],   dx:0,   dy:-46 },
-  { id:'edu_res',     c:'educor', label:['Educational','Resource'],    dx:56,  dy:20 },
-  { id:'edu_path',    c:'educor', label:['LearningPath'],              dx:-54, dy:24, dim:true },
+  { id:'edu_res',     c:'educor', label:['Educational','Resource'],    dx:54,  dy:16 },
+  { id:'edu_python',  c:'educor', label:['“Python”'],                  dx:-54, dy:20 },
+  { id:'edu_path',    c:'educor', label:['LearningPath'],              dx:2,   dy:62, dim:true },
 ];
 
 const INTRA_EDGES = [
-  ['esco_dev','esco_python'],['esco_python','esco_skill'],['esco_skill','esco_dig'],['esco_dev','esco_skill'],
   ['onet_dev','onet_prog'],['onet_prog','onet_ds'],
-  ['ceds_fname','ceds_cred'],['ceds_cred','ceds_course'],
-  ['sch_given','sch_lr'],['sch_lr','sch_person'],['sch_given','sch_person'],
+  ['ceds_fname','ceds_cred'],['ceds_cred','ceds_course'],['ceds_course','ceds_cip'],
   ['ctdl_cred','ctdl_cert'],['ctdl_cred','ctdl_comp'],
-  ['edu_skill','edu_res'],['edu_res','edu_path'],['edu_skill','edu_path'],
+  ['sch_given','sch_lr'],['sch_lr','sch_person'],['sch_given','sch_person'],
+  ['edu_skill','edu_res'],['edu_res','edu_path'],['edu_skill','edu_python'],['edu_path','edu_python'],
 ];
 
 const PREDS = {
@@ -346,30 +342,30 @@ const ROUNDS = [
     pair:'CEDS ↔ schema.org',
     triple:'ceds:FirstName skos:exactMatch schema:givenName .',
     why:'“First name” and “given name” are the same idea wearing two communities’ clothes, so the loom records the join as skos:exactMatch — interchangeable. Every registrar transcript can now feed a web-readable profile.' },
-  { id:'r2', a:'esco_dev', b:'onet_dev', best:'close',
-    scenario:'Ana’s CV is coded the EU way. US job listings describe jobs the US way.',
-    src:{ t:'Software developer', d:'Develops and implements software — as defined for 27 EU labour markets.' },
+  { id:'r2', a:'ceds_cip', b:'onet_dev', best:'related',
+    scenario:'Maria’s degree program is coded in the registrar’s records. A career counselor wants to know which jobs it leads to.',
+    src:{ t:'Program of study — Computer Science', d:'Maria’s degree program, recorded with CIP code 11.0701.' },
     opts:[
-      { t:'“Software Developers” — the US occupation', d:'The matching US job, with US wage and outlook data.', ok:true },
-      { t:'Programming — the skill',                   d:'Writing computer programs. A skill, not an occupation.' },
-      { t:'“Data Scientists” — the US occupation',     d:'A neighbouring but different job.' },
+      { t:'“Software Developers” — the US occupation', d:'The job the program most directly feeds — with wage and outlook data.', ok:true },
+      { t:'Programming — the skill',                   d:'Something the program teaches — not the occupation it leads to.' },
+      { t:'“Data Scientists” — the US occupation',     d:'Fed by statistics and data-science programs, not this one.' },
     ],
-    thread:'The occupation thread — the EU’s “software developer” joined to the US “Software Developers”',
-    pair:'ESCO ↔ O*NET',
-    triple:'esco:softwareDeveloper skos:closeMatch onetsoc:15-1252.00 .',
-    why:'This is a real, published crosswalk: ESCO maps its developer occupation to O*NET-SOC 15-1252.00 as a close match — the two definitions were written for different labour markets, so “close, not exact” is the honest claim. Ana’s CV just became legible in Washington.' },
-  { id:'r3', a:'esco_python', b:'onet_prog', best:'broad',
-    scenario:'An employer’s posting asks for general skills. A candidate’s profile lists specific ones.',
-    src:{ t:'Python', d:'The ability to write computer programs in the Python language.' },
+    thread:'The pathway thread — the registrar’s program of study joined to the occupation it leads to',
+    pair:'CEDS ↔ O*NET',
+    triple:'ceds:CIP-11.0701 skos:relatedMatch onetsoc:15-1252.00 .',
+    why:'This is the real NCES CIP→SOC crosswalk: programs of study mapped to the occupations they prepare people for. A program isn’t an occupation, so the loom records skos:relatedMatch — associated, neither equivalent nor broader. Education just joined the labour market.' },
+  { id:'r3', a:'edu_python', b:'onet_prog', best:'broad',
+    scenario:'An employer’s posting asks for general skills. A learner’s profile on the platform lists specific ones.',
+    src:{ t:'Python', d:'A skill the learning platform tracks — writing programs in the Python language.' },
     opts:[
       { t:'Programming',                        d:'Writing computer programs in any language — the broader skill.', ok:true },
       { t:'“Software Developers” — the US job', d:'A job that uses the skill — not the skill itself.' },
       { t:'“Data Scientists” — the US job',     d:'Also a job, not a skill.' },
     ],
     thread:'The skill-ladder thread — “Python” joined up to the broader “Programming”',
-    pair:'ESCO ↔ O*NET',
-    triple:'esco:python skos:broadMatch onet:Programming .',
-    why:'Python is one way to program, so it joins upward to the broader concept — the loom records skos:broadMatch, read as “Python ⊆ Programming.” Specific skills connecting to general demand is exactly how CVs meet job ads.' },
+    pair:'EduCOR ↔ O*NET',
+    triple:'educor:skill_python skos:broadMatch onet:Programming .',
+    why:'Python is one way to program, so it joins upward to the broader concept — the loom records skos:broadMatch, read as “Python ⊆ Programming.” Specific skills connecting to general demand is exactly how learner profiles meet job ads.' },
   { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'close',
     scenario:'Maria’s diploma lives in the registrar’s records. The public credential registry describes credentials so the whole market can trust and compare them.',
     src:{ t:'Credential', d:'A qualification awarded by an education institution — with US reporting fields.' },
@@ -382,18 +378,18 @@ const ROUNDS = [
     pair:'CEDS ↔ CTDL',
     triple:'ceds:Credential skos:closeMatch ceterms:Credential .',
     why:'CEDS models credentials for education agencies; CTDL — the Credential Transparency Description Language — models them so employers and learners can compare and trust them. The loom joins the near-twins as a close match, and a diploma can now answer the open market’s questions.' },
-  { id:'r5', a:'edu_skill', b:'esco_skill', best:'close',
-    scenario:'The learning platform wants its recommendations to track real labour-market demand.',
+  { id:'r5', a:'edu_skill', b:'ctdl_comp', best:'close',
+    scenario:'The learning platform wants its skills to line up with what credentials officially attest.',
     src:{ t:'Skill — as the platform tracks it', d:'A learner’s ability, tracked to recommend what to learn next.' },
     opts:[
-      { t:'Skill — the EU’s canonical class', d:'The ability to apply knowledge to complete tasks — where labour-market demand lives.', ok:true },
-      { t:'Software developer',               d:'An occupation that uses skills — not the idea of a skill.' },
-      { t:'Python',                           d:'One particular skill — not the class of all skills.' },
+      { t:'Competency — what a credential attests', d:'The registry’s term for a demonstrable ability a credential can certify.', ok:true },
+      { t:'Credential',                             d:'The award itself — not the ability it attests.' },
+      { t:'Certification',                          d:'One kind of credential — still not the ability.' },
     ],
-    thread:'The skill-alignment thread — the platform’s idea of a skill joined to the EU’s',
-    pair:'EduCOR ↔ ESCO',
-    triple:'educor:Skill skos:closeMatch esco:Skill .',
-    why:'EduCOR deliberately anchors its Skill class to ESCO — that link to the labour market is the ontology’s selling point — while keeping its own machinery for recommendations. The loom records skos:closeMatch: aligned, not fused.' },
+    thread:'The competency thread — the platform’s idea of a skill joined to the registry’s',
+    pair:'EduCOR ↔ CTDL',
+    triple:'educor:Skill skos:closeMatch ceasn:Competency .',
+    why:'CTDL-ASN describes competencies so a credential can say exactly what it attests. The platform’s “skill” is close kin — the loom records skos:closeMatch: aligned, while each keeps its own machinery.' },
   { id:'r6', a:'edu_res', b:'sch_lr', best:'exact',
     scenario:'The platform’s courses should be findable by anything that reads the open web.',
     src:{ t:'Educational resource', d:'Any resource a learner can study — video, article, exercise.' },
@@ -416,35 +412,42 @@ const QUERIES = [
     path:['ceds_course','ceds_cred','ctdl_cred'],
     why:'The query hops: her course section → the CEDS credential it earned → across your skos:closeMatch thread → the CTDL credential the registry publishes. Neither the registrar nor the registry changed a single field.' },
   { need:'r2',
-    title:'A CV emigrates',
-    text:'Ana’s CV is coded the EU way. She’s searching a US job board that describes jobs the US way. <b>Which thread lets her profile match the US listings?</b>',
-    path:['esco_python','esco_dev','onet_dev'],
-    why:'Her Python skill supports her ESCO occupation, and your closeMatch thread carries the query into O*NET’s 15-1252.00 — where the US listings live. One link, two labour markets, zero schema changes.' },
-  { need:'r5',
+    title:'The program that points to a paycheck',
+    text:'Maria’s transcript shows a Computer Science program. A career counselor wants to show her the occupations it leads to — with wage and outlook data. <b>Which thread answers it?</b>',
+    path:['ceds_course','ceds_cip','onet_dev'],
+    why:'Her course sections roll up to the program of study, and your relatedMatch thread carries the query into O*NET’s “Software Developers” — where the wages and outlook live. One link, education to labour market, zero schema changes.' },
+  { need:'r3',
     title:'The recommender looks outward',
-    text:'A learning platform wants to recommend a course teaching a skill that <em>EU employers</em> are asking for — demand data the platform itself doesn’t track. <b>Which thread powers the recommendation?</b>',
-    path:['edu_path','edu_skill','esco_skill'],
-    why:'The learning path names an EduCOR skill; your thread aligns it with ESCO’s skill, where labour-market demand lives. The recommender just got smarter without adding one field to its own ontology.' },
+    text:'The learning platform wants to recommend a course teaching a skill that <em>US employers</em> are asking for — demand data the platform itself doesn’t track. <b>Which thread powers the recommendation?</b>',
+    path:['edu_path','edu_python','onet_prog'],
+    why:'The learning path names the platform’s “Python” skill; your broadMatch thread joins it to O*NET’s “Programming”, where employer demand lives. The recommender just got smarter without adding one field to its own ontology.' },
 ];
 
+/* thresholds are fractions of the max score for the mode played */
 const RANKS = [
   [0,   'Silo Dweller',        'Your data is safe. Also alone. Weave again?'],
-  [300, 'Crosswalk Apprentice','You can see the bridges now. The precision comes with practice.'],
-  [600, 'Linked-Data Weaver',  'Your threads hold weight. Query engines trust you.'],
-  [800, 'Federation Architect','Six vocabularies, one living graph. The loom is yours.'],
+  [0.4, 'Crosswalk Apprentice','You can see the bridges now. The precision comes with practice.'],
+  [0.7, 'Linked-Data Weaver',  'Your threads hold weight. Query engines trust you.'],
+  [0.9, 'Federation Architect','Five vocabularies, one living graph. The loom is yours.'],
 ];
 
 /* ════════════════════════ STATE ════════════════════════ */
 
 const S = {
   screen:'intro',
+  mode:'quick',         // 'quick' (3 joins, 2 queries) | 'full'
   score:0, shownScore:0,
-  richness:0,           // out of 12
+  richness:0,
   roundIdx:0, act2Score:0, bestCount:0,
   queryIdx:0, act3Score:0, queryRight:0,
   links:[],             // {a,b,pred,born}
   pulse:null,           // {path:[ids], t0}
 };
+
+const QUICK_ROUNDS  = ['r1','r2','r4'];
+const QUICK_QUERIES = ['r4','r2'];
+const activeRounds  = ()=> S.mode==='quick' ? ROUNDS.filter(r=>QUICK_ROUNDS.includes(r.id)) : ROUNDS;
+const activeQueries = ()=> S.mode==='quick' ? QUERIES.filter(q=>QUICK_QUERIES.includes(q.need)) : QUERIES;
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -453,7 +456,12 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const scoreEl = document.getElementById('scoreVal');
 const meterEl = document.getElementById('meter');
 const actTag  = document.getElementById('actTag');
-for (let i=0;i<12;i++) meterEl.appendChild(document.createElement('i'));
+function buildMeter(){
+  meterEl.innerHTML='';
+  const n = activeRounds().length*2;
+  for (let i=0;i<n;i++) meterEl.appendChild(document.createElement('i'));
+}
+buildMeter();
 
 function addScore(pts){
   if (pts<=0) return;
@@ -464,7 +472,7 @@ function addScore(pts){
   setTimeout(()=>pop.remove(), 1500);
 }
 function addRichness(n){
-  S.richness = Math.min(12, S.richness+n);
+  S.richness = Math.min(meterEl.children.length, S.richness+n);
   [...meterEl.children].forEach((seg,i)=> seg.classList.toggle('lit', i<S.richness));
 }
 
@@ -621,9 +629,9 @@ function renderPrologue(){
   actTag.textContent='PROLOGUE';
   panel.innerHTML = `
     <div>
-      <span class="eyebrow">Prologue · Why six maps?</span>
-      <h2>One territory. Six maps. Forever.</h2>
-      <p class="lede">Each vocabulary on the graph was drawn by a different community, to answer that community’s own questions. The registrar (<b style="color:var(--ceds)">CEDS</b>) asks “did Maria earn the credits?” The public credential registry (<b style="color:#e58bab">CTDL</b>) asks “can an employer trust what her diploma claims?” The EU labour ministry (ESCO) asks “does her CV match a vacancy in Warsaw?” Those two underlined on the graph — CEDS and CTDL — are the standards this loom is really about.</p>
+      <span class="eyebrow">Prologue · Why five maps?</span>
+      <h2>One territory. Five maps. Forever.</h2>
+      <p class="lede">Each vocabulary on the graph was drawn by a different community, to answer that community’s own questions. The registrar (<b style="color:var(--ceds)">CEDS</b>) asks “did Maria earn the credits?” The public credential registry (<b style="color:#e58bab">CTDL</b>) asks “can an employer trust what her diploma claims?” The occupation data bank (O*NET) asks “what do these jobs pay, and what skills do they need?” The two underlined on the graph — CEDS and CTDL — are the standards this loom is really about.</p>
     </div>
     <div class="card" style="font-size:13.5px; color:var(--muted)">
       A single merged mega-ontology would have to answer <em>everyone’s</em> questions — which is how it ends up answering no one’s. Multiple ontologies aren’t a failure of coordination; they’re fitness. They will always exist.
@@ -633,7 +641,8 @@ function renderPrologue(){
       <span class="eyebrow" style="display:block; margin-bottom:8px">How to play</span>
       <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px">
         <div><b>Act I · The Weave.</b> You’re shown a concept from one vocabulary. Pick the concept it joins to in another. Every join weaves a gold thread onto the graph (+100) and lights up the “questions answerable” meter.</div>
-        <div><b>Act II · The Harvest.</b> Three federated queries travel your threads. Send each one down the right thread (+100) and watch it cross the graph.</div>
+        <div><b>Act II · The Harvest.</b> Federated queries travel your threads. Send each one down the right thread (+100) and watch it cross the graph.</div>
+        <div style="color:var(--muted)">You’ll start with the quick game — three joins, two queries. The expanded loom unlocks after your first verdict.</div>
       </div>
     </div>
     <button class="btn-primary" id="toAct1">Pick up the golden thread → Act I</button>`;
@@ -643,7 +652,8 @@ function renderPrologue(){
 /* ── ACT I · THE WEAVE ── */
 function renderAct2(){
   actTag.textContent='ACT I · THE WEAVE';
-  const r = ROUNDS[S.roundIdx];
+  const A = activeRounds();
+  const r = A[S.roundIdx];
   const cs = CLUSTERS[nodeById[r.a].c], ct = CLUSTERS[nodeById[r.b].c];
   const order = [0,1,2].map(j=>(j+S.roundIdx)%3);
   panel.innerHTML = `
@@ -651,7 +661,7 @@ function renderAct2(){
       <span class="eyebrow">Act I · The weave</span>
       <h2>Where does this join?</h2>
       <p class="lede">${r.scenario}</p>
-      ${dots(ROUNDS.length, S.roundIdx)}
+      ${dots(A.length, S.roundIdx)}
     </div>
     <div class="concept" style="--cl:${cs.color}">
       <span class="scheme">${cs.name}</span>
@@ -679,7 +689,7 @@ function renderAct2(){
       /* the loom always weaves the TRUE join, so the graph stays sound */
       S.links.push({ a:r.a, b:r.b, pred:PREDS[r.best].n, born:performance.now(), round:r.id });
       addRichness(2);
-      const last = S.roundIdx===ROUNDS.length-1;
+      const last = S.roundIdx===A.length-1;
       document.getElementById('fb').innerHTML = `
         <div class="verdict ${right?'v-best':'v-bad'}">
           <span class="verdict-head">${right?'Joined. +100':'Not that one — the loom weaves the true join.'}</span>
@@ -700,17 +710,18 @@ function renderAct2(){
 /* ── ACT II · THE HARVEST ── */
 function renderAct3(){
   actTag.textContent='ACT II · THE HARVEST';
-  const q = QUERIES[S.queryIdx];
+  const AQ = activeQueries(), AR = activeRounds();
+  const q = AQ[S.queryIdx];
   /* option bridges: correct + 2 decoys, shuffled deterministically enough */
-  const decoys = ROUNDS.filter(r=>r.id!==q.need);
-  const opts = [ROUNDS.find(r=>r.id===q.need), decoys[(S.queryIdx*2)%decoys.length], decoys[(S.queryIdx*2+3)%decoys.length]]
+  const decoys = AR.filter(r=>r.id!==q.need);
+  const opts = [AR.find(r=>r.id===q.need), decoys[(S.queryIdx*2)%decoys.length], decoys[(S.queryIdx*2+3)%decoys.length]]
     .sort((a,b)=> a.ua<b.ua?-1:1);
   panel.innerHTML = `
     <div>
       <span class="eyebrow">Act II · The harvest</span>
       <h2>${q.title}</h2>
       <p class="lede">Federated queries travel your threads. Send this one down the right thread.</p>
-      ${dots(QUERIES.length, S.queryIdx)}
+      ${dots(AQ.length, S.queryIdx)}
     </div>
     <div class="card" style="font-size:14px">${q.text}</div>
     <div class="choice-list">
@@ -731,7 +742,7 @@ function renderAct3(){
       });
       if (right){ addScore(100); S.act3Score+=100; S.queryRight++; }
       S.pulse = { path:q.path, t0:performance.now() };
-      const last = S.queryIdx===QUERIES.length-1;
+      const last = S.queryIdx===AQ.length-1;
       document.getElementById('fb').innerHTML = `
         <div class="verdict ${right?'v-best':'v-bad'}">
           <span class="verdict-head">${right?'The query lands. +100':'It took a different thread — watch the graph.'}</span>
@@ -750,17 +761,19 @@ function renderAct3(){
 /* ── END ── */
 function renderEnd(){
   actTag.textContent='EPILOGUE';
+  const nR = activeRounds().length, nQ = activeQueries().length;
+  const max = nR*100 + nQ*100;
   let rank=RANKS[0];
-  RANKS.forEach(r=>{ if (S.score>=r[0]) rank=r; });
+  RANKS.forEach(r=>{ if (S.score >= r[0]*max) rank=r; });
   panel.innerHTML = `
     <div>
-      <span class="eyebrow">The loom’s verdict · ${S.score} points</span>
+      <span class="eyebrow">The loom’s verdict · ${S.score} / ${max}</span>
       <div class="rank">${rank[1]}</div>
       <p class="lede">${rank[2]}</p>
     </div>
     <div class="card breakdown">
-      Act I · weaving <b>${S.act2Score}</b> (${S.bestCount}/6 true joins)<br>
-      Act II · queries <b>${S.act3Score}</b> (${S.queryRight}/3)
+      Act I · weaving <b>${S.act2Score}</b> (${S.bestCount}/${nR} true joins)<br>
+      Act II · queries <b>${S.act3Score}</b> (${S.queryRight}/${nQ})
     </div>
     <div class="card">
       <span class="eyebrow" style="display:block; margin-bottom:8px">What the loom teaches</span>
@@ -771,15 +784,20 @@ function renderEnd(){
         <li>Every thread you wove made <b>new questions answerable</b> — and nobody had to change their schema.</li>
       </ul>
     </div>
-    <button class="btn-primary" id="again">Weave again</button>
-    <p class="credits">Grounded in real vocabularies: <a href="https://esco.ec.europa.eu/" target="_blank" rel="noopener">ESCO</a> · <a href="https://www.onetonline.org/" target="_blank" rel="noopener">O*NET</a> · <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · <a href="https://arxiv.org/abs/2107.05522" target="_blank" rel="noopener">EduCOR</a>, linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a>. The ESCO↔O*NET closeMatch crosswalk is real and published. Nothing here is saved — close the tab and the loom forgets you.</p>`;
-  document.getElementById('again').addEventListener('click', ()=>{
-    Object.assign(S, { score:0, shownScore:0, richness:0,
+    ${S.mode==='quick' ? `<button class="btn-primary" id="expand">Play the expanded loom — 6 joins · 3 queries</button>
+    <button id="again" style="text-align:center">Weave the quick game again</button>`
+    : `<button class="btn-primary" id="again">Weave again</button>`}
+    <p class="credits">Grounded in real vocabularies: <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://credreg.net/" target="_blank" rel="noopener">CTDL</a> · <a href="https://www.onetonline.org/" target="_blank" rel="noopener">O*NET</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · <a href="https://arxiv.org/abs/2107.05522" target="_blank" rel="noopener">EduCOR</a>, linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a>. The CIP→SOC crosswalk is real and published by NCES. Nothing here is saved — close the tab and the loom forgets you.</p>`;
+  const reset = mode => {
+    Object.assign(S, { mode, score:0, shownScore:0, richness:0,
       roundIdx:0, act2Score:0, bestCount:0, queryIdx:0, act3Score:0, queryRight:0,
       links:[], pulse:null });
-    [...meterEl.children].forEach(seg=>seg.classList.remove('lit'));
+    buildMeter();
     renderAct2();
-  });
+  };
+  document.getElementById('again').addEventListener('click', ()=>reset(S.mode));
+  const ex = document.getElementById('expand');
+  if (ex) ex.addEventListener('click', ()=>reset('full'));
 }
 
 /* ── intro ── */
@@ -787,7 +805,7 @@ panel.innerHTML = `
   <div>
     <span class="eyebrow">Prologue</span>
     <h2>Five maps of one territory</h2>
-    <p class="lede">The graph beside you shows six real vocabularies that describe learning and work — with CEDS and CTDL, the credential standards, underlined in gold. Right now, nothing connects them — a question asked in one cannot be answered by another.</p>
+    <p class="lede">The graph beside you shows five real US-focused vocabularies that describe learning and work — with CEDS and CTDL, the credential standards, underlined in gold. Right now, nothing connects them — a question asked in one cannot be answered by another.</p>
   </div>
   <div class="card" style="color:var(--muted); font-size:13.5px">Press <b style="color:var(--text)">Sit at the loom</b> to begin.</div>`;
 

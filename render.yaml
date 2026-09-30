@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: federation-loom
+    runtime: static
+    buildCommand: mkdir -p dist && cp index.html dist/
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: true
+    routes:
+      # Single page: send any path to the game rather than a 404.
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin

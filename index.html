@@ -184,6 +184,11 @@
   }
   @keyframes rise{from{opacity:0; transform:translateY(6px)} to{opacity:1}}
   .verdict-head{font-family:var(--display); font-weight:700; font-size:15px}
+  .caveat{
+    font-size:12.5px; color:var(--muted); line-height:1.5;
+    border-left:2px solid var(--warn); padding-left:10px;
+  }
+  .caveat b{color:var(--text)}
   .verdict.v-best .verdict-head{color:var(--good)}
   .verdict.v-ok .verdict-head{color:var(--warn)}
   .verdict.v-bad .verdict-head{color:var(--bad)}
@@ -325,12 +330,14 @@ const PREDS = {
   related: { n:'skos:relatedMatch',    g:'Associated, but neither equivalent nor hierarchical.' },
   sameas:  { n:'owl:sameAs',           g:'These two IRIs are the very same individual thing.' },
   eqclass: { n:'owl:equivalentClass',  g:'Every member of one class is a member of the other.' },
+  eqprop:  { n:'owl:equivalentProperty', g:'Two properties that always hold of the same pairs.' },
+  subclass:{ n:'rdfs:subClassOf',      g:'Every member of the left class is a member of the right.' },
   seealso: { n:'rdfs:seeAlso',         g:'“More info over there.” A hint with no formal meaning.' },
 };
 
 /* Act I — six joining rounds */
 const ROUNDS = [
-  { id:'r1', a:'ceds_fname', b:'sch_given', best:'exact',
+  { id:'r1', a:'ceds_fname', b:'sch_given', best:'eqprop',
     scenario:'The university registrar must publish student profiles that the open web can read.',
     src:{ t:'First name', d:'The legal first name of a person, as the registrar records it.' },
     opts:[
@@ -340,8 +347,8 @@ const ROUNDS = [
     ],
     thread:'The name thread — the registrar’s “first name” joined to the web’s “given name”',
     pair:'CEDS ↔ schema.org',
-    triple:'ceds:FirstName skos:exactMatch schema:givenName .',
-    why:'“First name” and “given name” are the same idea wearing two communities’ clothes, so the loom records the join as skos:exactMatch — interchangeable. Every registrar transcript can now feed a web-readable profile.' },
+    triple:'ceds:FirstName owl:equivalentProperty schema:givenName .',
+    why:'“First name” and “given name” are the same idea wearing two communities’ clothes. But these two are <em>properties</em>, not entries in a code list — so the loom records owl:equivalentProperty rather than a SKOS match. Every registrar transcript can now feed a web-readable profile.' },
   { id:'r2', a:'ceds_cip', b:'onet_dev', best:'related',
     scenario:'Maria’s degree program is coded in the registrar’s records. A career counselor wants to know which jobs it leads to.',
     src:{ t:'Program of study — Computer Science', d:'Maria’s degree program, recorded with CIP code 11.0701.' },
@@ -366,7 +373,7 @@ const ROUNDS = [
     pair:'EduCOR ↔ O*NET',
     triple:'educor:skill_python skos:broadMatch onet:Programming .',
     why:'Python is one way to program, so it joins upward to the broader concept — the loom records skos:broadMatch, read as “Python ⊆ Programming.” Specific skills connecting to general demand is exactly how learner profiles meet job ads.' },
-  { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'close',
+  { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'subclass',
     scenario:'Maria’s diploma lives in the registrar’s records. The public credential registry describes credentials so the whole market can trust and compare them.',
     src:{ t:'Credential', d:'A qualification awarded by an education institution — with US reporting fields.' },
     opts:[
@@ -376,9 +383,9 @@ const ROUNDS = [
     ],
     thread:'The credential thread — the registrar’s credential joined to the credential registry’s',
     pair:'CEDS ↔ CTDL',
-    triple:'ceds:Credential skos:closeMatch ceterms:Credential .',
-    why:'CEDS models credentials for education agencies; CTDL — the Credential Transparency Description Language — models them so employers and learners can compare and trust them. The loom joins the near-twins as a close match, and a diploma can now answer the open market’s questions.' },
-  { id:'r5', a:'edu_skill', b:'ctdl_comp', best:'close',
+    triple:'ceds:Credential rdfs:subClassOf ceterms:Credential .',
+    why:'CEDS models credentials for education agencies; CTDL — the Credential Transparency Description Language — models them so employers and learners can compare and trust them. Both are <em>classes</em>, so the join is an OWL/RDFS axiom rather than a SKOS match — and CTDL’s Credential is the wider of the two (it also covers certifications, licences and badges), so the honest claim is rdfs:subClassOf. The registrar’s credential records can now be read in the registry’s terms.' },
+  { id:'r5', a:'edu_skill', b:'ctdl_comp', best:'subclass',
     scenario:'The learning platform wants its skills to line up with what credentials officially attest.',
     src:{ t:'Skill — as the platform tracks it', d:'A learner’s ability, tracked to recommend what to learn next.' },
     opts:[
@@ -388,9 +395,9 @@ const ROUNDS = [
     ],
     thread:'The competency thread — the platform’s idea of a skill joined to the registry’s',
     pair:'EduCOR ↔ CTDL',
-    triple:'educor:Skill skos:closeMatch ceasn:Competency .',
-    why:'CTDL-ASN describes competencies so a credential can say exactly what it attests. The platform’s “skill” is close kin — the loom records skos:closeMatch: aligned, while each keeps its own machinery.' },
-  { id:'r6', a:'edu_res', b:'sch_lr', best:'exact',
+    triple:'educor:Skill rdfs:subClassOf ceasn:Competency .',
+    why:'CTDL-ASN describes competencies so a credential can say exactly what it attests — and its Competency spans knowledge, skills and abilities alike. Two classes again, so again an RDFS axiom: every skill the platform tracks is a competency in the registry’s sense, though not every competency is a skill. Aligned, while each keeps its own machinery.' },
+  { id:'r6', a:'edu_res', b:'sch_lr', best:'eqclass',
     scenario:'The platform’s courses should be findable by anything that reads the open web.',
     src:{ t:'Educational resource', d:'Any resource a learner can study — video, article, exercise.' },
     opts:[
@@ -400,17 +407,18 @@ const ROUNDS = [
     ],
     thread:'The resource thread — the platform’s study material joined to the web’s',
     pair:'EduCOR ↔ schema.org',
-    triple:'educor:EducationalResource skos:exactMatch\n    schema:LearningResource .',
-    why:'EduCOR was built on LRMI and schema.org, so here the concepts genuinely coincide — the loom records skos:exactMatch. Every resource on the platform is now visible to anything that speaks schema.org.' },
+    triple:'educor:EducationalResource owl:equivalentClass\n    schema:LearningResource .',
+    why:'EduCOR was built on LRMI and schema.org, so here the two classes genuinely coincide — and because they are classes, the loom records owl:equivalentClass: every member of one is a member of the other. Every resource on the platform is now visible to anything that speaks schema.org.' },
 ];
 
 /* Act II — three federated queries */
 const QUERIES = [
   { need:'r4',
-    title:'The diploma that crosses the wall',
-    text:'Maria’s diploma lives in the registrar’s records. An employer checks credentials against the public credential registry. <b>Which of your threads lets one query prove her diploma is the real thing?</b>',
+    title:'The diploma that speaks the registry’s language',
+    text:'Maria’s diploma sits in the registrar’s records as a CEDS credential. An employer reads credentials in the public registry’s terms and wants to know what this kind of award attests. <b>Which of your threads lets one query read her record in the registry’s vocabulary?</b>',
     path:['ceds_course','ceds_cred','ctdl_cred'],
-    why:'The query hops: her course section → the CEDS credential it earned → across your skos:closeMatch thread → the CTDL credential the registry publishes. Neither the registrar nor the registry changed a single field.' },
+    why:'The query hops: her course section → the CEDS credential it earned → across your rdfs:subClassOf thread → the CTDL credential the registry describes. Neither side changed a field.',
+    caveat:'Be precise about what this buys you. The thread aligns two <em>schemas</em>, so the query can ask “what kind of credential is this, and what does the registry say that kind attests?” It does <b>not</b> verify Maria’s particular diploma — that takes an issuer-signed credential, or an instance published in the registry by the issuer. Alignment makes the question askable; provenance answers it.' },
   { need:'r2',
     title:'The program that points to a paycheck',
     text:'Maria’s transcript shows a Computer Science program. A career counselor wants to show her the occupations it leads to — with wage and outlook data. <b>Which thread answers it?</b>',
@@ -635,7 +643,13 @@ function renderPrologue(){
     </div>
     <div class="card" style="font-size:13.5px; color:var(--muted)">
       A single merged mega-ontology would have to answer <em>everyone’s</em> questions — which is how it ends up answering no one’s. Multiple ontologies aren’t a failure of coordination; they’re fitness. They will always exist.
-      <div style="margin-top:8px; color:var(--text)">But RDF lets separate vocabularies point at each other. One small link — <span style="font-family:var(--mono); color:var(--gold)">this concept joins that one</span> — and questions start flowing across the walls.</div>
+      <div style="margin-top:8px; color:var(--text)">But RDF lets separate vocabularies point at each other. One small link — <span style="font-family:var(--mono); color:var(--gold)">this term joins that one</span> — and questions start flowing across the walls.</div>
+    </div>
+    <div class="card" style="font-size:13.5px; color:var(--muted)">
+      <span class="eyebrow" style="display:block; margin-bottom:8px">Two kinds of thread, because two kinds of thing</span>
+      <div><b style="color:var(--text)">Concepts</b> — the entries in a code list or taxonomy, like a CIP program code or an O*NET skill — join with SKOS: <span style="font-family:var(--mono); color:var(--gold)">exactMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">broadMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">relatedMatch</span>.</div>
+      <div style="margin-top:6px"><b style="color:var(--text)">Classes and properties</b> — the structure of an ontology, like <span style="font-family:var(--mono)">ceds:Credential</span> — join with OWL and RDFS: <span style="font-family:var(--mono); color:var(--gold)">equivalentClass</span>, <span style="font-family:var(--mono); color:var(--gold)">subClassOf</span>, <span style="font-family:var(--mono); color:var(--gold)">equivalentProperty</span>.</div>
+      <div style="margin-top:6px">SKOS mapping properties are defined to hold between instances of <span style="font-family:var(--mono)">skos:Concept</span>. Reaching for one between two classes is the most common way a crosswalk goes subtly wrong — the loom won’t do it.</div>
     </div>
     <div class="card">
       <span class="eyebrow" style="display:block; margin-bottom:8px">How to play</span>
@@ -668,7 +682,7 @@ function renderAct2(){
       <div class="title">${r.src.t}</div>
       <div class="def">${r.src.d}</div>
     </div>
-    <div class="link-mark">—— joins which ${ct.name} concept? ——</div>
+    <div class="link-mark">—— joins which ${ct.name} term? ——</div>
     <div class="choice-list">
       ${order.map(i=>{ const o=r.opts[i]; return `
         <button class="pred-btn" data-i="${i}" style="border-left:3px solid ${ct.color}66">
@@ -693,7 +707,7 @@ function renderAct2(){
       document.getElementById('fb').innerHTML = `
         <div class="verdict ${right?'v-best':'v-bad'}">
           <span class="verdict-head">${right?'Joined. +100':'Not that one — the loom weaves the true join.'}</span>
-          <div class="triple">${esc(r.triple).replace(/skos:\w+|owl:\w+/g, m=>'<span class="p">'+m+'</span>')}</div>
+          <div class="triple">${esc(r.triple).replace(/skos:\w+|owl:\w+|rdfs:\w+/g, m=>'<span class="p">'+m+'</span>')}</div>
           <span>${r.why}</span>
           <span style="color:var(--muted); font-size:12.5px">Watch the gold thread appear on the graph. Questions answerable: <b style="color:var(--gold)">+2</b>.</span>
           <button class="btn-primary" id="next">${last?'The graph is woven → Act II':'Next join'}</button>
@@ -714,8 +728,9 @@ function renderAct3(){
   const q = AQ[S.queryIdx];
   /* option bridges: correct + 2 decoys, shuffled deterministically enough */
   const decoys = AR.filter(r=>r.id!==q.need);
-  const opts = [AR.find(r=>r.id===q.need), decoys[(S.queryIdx*2)%decoys.length], decoys[(S.queryIdx*2+3)%decoys.length]]
-    .sort((a,b)=> a.ua<b.ua?-1:1);
+  const picked = [AR.find(r=>r.id===q.need), decoys[(S.queryIdx*2)%decoys.length], decoys[(S.queryIdx*2+3)%decoys.length]];
+  /* rotate so the true thread isn't always the first button */
+  const opts = [0,1,2].map(j=>picked[(j+S.queryIdx)%3]);
   panel.innerHTML = `
     <div>
       <span class="eyebrow">Act II · The harvest</span>
@@ -747,6 +762,7 @@ function renderAct3(){
         <div class="verdict ${right?'v-best':'v-bad'}">
           <span class="verdict-head">${right?'The query lands. +100':'It took a different thread — watch the graph.'}</span>
           <span>${q.why}</span>
+          ${q.caveat ? `<span class="caveat"><b>What a link does and doesn’t prove.</b> ${q.caveat}</span>` : ''}
           <button class="btn-primary" id="next">${last?'Read the loom’s verdict':'Next query'}</button>
         </div>`;
       document.getElementById('fb').scrollIntoView({behavior:REDUCED?'auto':'smooth', block:'end'});
@@ -780,14 +796,20 @@ function renderEnd(){
       <ul class="takeaways">
         <li>Ontologies are <b>local by design</b> — each answers its own community’s questions. That’s fitness, not fragmentation.</li>
         <li>They will <b>never collapse into one</b>. Every merge committee rediscovers this the slow way.</li>
-        <li><b>RDF links</b> — skos:exactMatch, closeMatch, broadMatch — let separate vocabularies behave like one living graph, each claim saying exactly as much as is true.</li>
+        <li><b>RDF links</b> let separate vocabularies behave like one living graph, each claim saying exactly as much as is true.</li>
+        <li><b>Match the link to the thing it links.</b> SKOS matches join <em>concepts</em> — code-list and taxonomy entries. OWL and RDFS axioms join <em>classes and properties</em>. Mixing the two is the most common flaw in a published crosswalk.</li>
+        <li><b>Alignment is not verification.</b> A thread between two schemas makes a question <em>askable</em> across them. Whether one learner’s credential is genuine is a separate question, answered by an issuer-signed credential or a registry-published instance — never by a mapping.</li>
         <li>Every thread you wove made <b>new questions answerable</b> — and nobody had to change their schema.</li>
       </ul>
+    </div>
+    <div class="card" style="font-size:13px; color:var(--muted)">
+      <span class="eyebrow" style="display:block; margin-bottom:8px">If you know EDUcore</span>
+      EDUcore runs this same federation on a Neo4j property graph rather than an RDF triplestore: its <span style="font-family:var(--mono); color:var(--gold)">MAPS_TO</span> and <span style="font-family:var(--mono); color:var(--gold)">STRUCTURALLY_MAPS_TO</span> relationships carry what the SKOS matches and the OWL/RDFS axioms carry here. Different storage, same loom — concepts align to concepts, structure aligns to structure.
     </div>
     ${S.mode==='quick' ? `<button class="btn-primary" id="expand">Play the expanded loom — 6 joins · 3 queries</button>
     <button id="again" style="text-align:center">Weave the quick game again</button>`
     : `<button class="btn-primary" id="again">Weave again</button>`}
-    <p class="credits">Grounded in real vocabularies: <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://credreg.net/" target="_blank" rel="noopener">CTDL</a> · <a href="https://www.onetonline.org/" target="_blank" rel="noopener">O*NET</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · <a href="https://arxiv.org/abs/2107.05522" target="_blank" rel="noopener">EduCOR</a>, linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a>. The CIP→SOC crosswalk is real and published by NCES. Nothing here is saved — close the tab and the loom forgets you.</p>`;
+    <p class="credits">Grounded in real vocabularies: <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://credreg.net/" target="_blank" rel="noopener">CTDL</a> · <a href="https://www.onetonline.org/" target="_blank" rel="noopener">O*NET</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · <a href="https://arxiv.org/abs/2107.05522" target="_blank" rel="noopener">EduCOR</a>, linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a> and <a href="https://www.w3.org/TR/owl2-overview/" target="_blank" rel="noopener">OWL</a>/RDFS. The CIP→SOC crosswalk is real and published by NCES. Nothing here is saved — close the tab and the loom forgets you.</p>`;
   const reset = mode => {
     Object.assign(S, { mode, score:0, shownScore:0, richness:0,
       roundIdx:0, act2Score:0, bestCount:0, queryIdx:0, act3Score:0, queryRight:0,

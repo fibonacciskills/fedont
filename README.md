@@ -4,13 +4,8 @@ An interactive, scored game that teaches federated ontologies: multiple ontologi
 always exist — and that's healthy — but RDF links (SKOS/OWL) let them behave like one
 living, richer graph.
 
-<<<<<<< Updated upstream
-Play in two acts across five real US-focused vocabularies — CEDS and CTDL (the focus
-standards, underlined in gold on the graph) plus O*NET, schema.org, and EDUcore:
-=======
 Play in two acts across four real US-focused vocabularies — CEDS and CTDL (the focus
-standards, underlined in gold on the graph) plus schema.org and EduCOR:
->>>>>>> Stashed changes
+standards, underlined in gold on the graph) plus schema.org and EDUcore:
 
 - **Prologue.** A brief read on why multiple ontologies exist (and always will), and how to play.
 - **Act I — The Weave.** Judge which term in another vocabulary each term joins to;
@@ -22,7 +17,7 @@ standards, underlined in gold on the graph) plus schema.org and EduCOR:
 The game is deliberate about this, because published crosswalks often aren't. SKOS
 mapping properties (`skos:exactMatch`, `broadMatch`, `relatedMatch`) are defined to hold
 between instances of `skos:Concept` — code-list and taxonomy entries such as a CIP
-program code or a published competency. Ontology **classes and properties** take OWL/RDFS
+program code or a SOC occupation. Ontology **classes and properties** take OWL/RDFS
 instead (`owl:equivalentClass`, `rdfs:subClassOf`, `owl:equivalentProperty`). So
 `ceds:CredentialDefinition → ceterms:Credential` is an `owl:equivalentClass` axiom, not a
 `skos:exactMatch`. (CEDS v14 has no class named Credential; Credential Definition is its
@@ -35,8 +30,8 @@ the registry by the issuer.
 
 ### EDUcore on the graph
 
-EDUcore, the education standards knowledge graph, is the fifth vocabulary. Its nodes in
-the game are real forged nodes from that graph: the O*NET-SOC occupation 15-1252, the
+EDUcore, the education standards knowledge graph, is the fourth vocabulary. Its nodes in
+the game are real forged nodes from that graph: the SOC occupation 15-1252, the
 CIP program 11.0701 (one `CLASSIFICATION_CROSSWALK` edge apart, per the NCES crosswalk),
 CTDL-ASN's `ceasn:Competency`, and CEDS's Learning Resource class (C200228). EDUcore runs
 the same federation on a Neo4j property graph rather than an RDF triplestore: each
@@ -46,7 +41,10 @@ carries CIP→SOC. Different storage, same principle: concepts align to concepts
 aligns to structure. The game says this on the score screen.
 
 The facts behind every join and query were checked against the live EDUcore graph via
-its MCP server (standards inventory, class definitions, crosswalk edges).
+its MCP server (standards inventory, class definitions, crosswalk edges) — and that same
+MCP server is the point the score screen makes: an agent with access to the graph can walk
+the standards and propose these matches, including which kind each one has to be, instead
+of a human judging them one at a time. [educore.org](https://educore.org)
 
 The first play is a quick game (3 joins, 2 queries); the expanded loom (6 joins, 3 queries)
 unlocks from the score screen. Every visit and every replay deals a fresh random hand — which
@@ -82,13 +80,8 @@ branch root.
 ## Grounded in
 
 [CEDS](https://ceds.ed.gov/) · [CTDL](https://credreg.net/) ·
-<<<<<<< Updated upstream
-[O*NET](https://www.onetonline.org/) · [schema.org](https://schema.org/) ·
-EDUcore · [SKOS](https://www.w3.org/TR/skos-reference/) ·
-=======
 [schema.org](https://schema.org/) ·
-[EduCOR](https://arxiv.org/abs/2107.05522) · [SKOS](https://www.w3.org/TR/skos-reference/) ·
->>>>>>> Stashed changes
+[EDUcore](https://educore.org) · [SKOS](https://www.w3.org/TR/skos-reference/) ·
 [OWL](https://www.w3.org/TR/owl2-overview/).
-CIP program codes are real, published by NCES, and used as a controlled vocabulary by
-both CEDS and CTDL — which is what the `skos:exactMatch` round in the game turns on.
+The CIP→SOC program-to-occupation crosswalk in the game is real, published by NCES, and
+carried in EDUcore as 8,324 `CLASSIFICATION_CROSSWALK` edges.

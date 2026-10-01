@@ -4,8 +4,13 @@ An interactive, scored game that teaches federated ontologies: multiple ontologi
 always exist — and that's healthy — but RDF links (SKOS/OWL) let them behave like one
 living, richer graph.
 
+<<<<<<< Updated upstream
 Play in two acts across five real US-focused vocabularies — CEDS and CTDL (the focus
 standards, underlined in gold on the graph) plus O*NET, schema.org, and EDUcore:
+=======
+Play in two acts across four real US-focused vocabularies — CEDS and CTDL (the focus
+standards, underlined in gold on the graph) plus schema.org and EduCOR:
+>>>>>>> Stashed changes
 
 - **Prologue.** A brief read on why multiple ontologies exist (and always will), and how to play.
 - **Act I — The Weave.** Judge which term in another vocabulary each term joins to;
@@ -17,7 +22,7 @@ standards, underlined in gold on the graph) plus O*NET, schema.org, and EDUcore:
 The game is deliberate about this, because published crosswalks often aren't. SKOS
 mapping properties (`skos:exactMatch`, `broadMatch`, `relatedMatch`) are defined to hold
 between instances of `skos:Concept` — code-list and taxonomy entries such as a CIP
-program code or an O*NET skill. Ontology **classes and properties** take OWL/RDFS
+program code or a published competency. Ontology **classes and properties** take OWL/RDFS
 instead (`owl:equivalentClass`, `rdfs:subClassOf`, `owl:equivalentProperty`). So
 `ceds:CredentialDefinition → ceterms:Credential` is an `owl:equivalentClass` axiom, not a
 `skos:exactMatch`. (CEDS v14 has no class named Credential; Credential Definition is its
@@ -77,7 +82,13 @@ branch root.
 ## Grounded in
 
 [CEDS](https://ceds.ed.gov/) · [CTDL](https://credreg.net/) ·
+<<<<<<< Updated upstream
 [O*NET](https://www.onetonline.org/) · [schema.org](https://schema.org/) ·
 EDUcore · [SKOS](https://www.w3.org/TR/skos-reference/) ·
+=======
+[schema.org](https://schema.org/) ·
+[EduCOR](https://arxiv.org/abs/2107.05522) · [SKOS](https://www.w3.org/TR/skos-reference/) ·
+>>>>>>> Stashed changes
 [OWL](https://www.w3.org/TR/owl2-overview/).
-The CIP→SOC program-to-occupation crosswalk in the game is real, published by NCES.
+CIP program codes are real, published by NCES, and used as a controlled vocabulary by
+both CEDS and CTDL — which is what the `skos:exactMatch` round in the game turns on.

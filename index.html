@@ -21,7 +21,11 @@
     --good:#7fc98a;
     --warn:#e0b458;
     --bad:#d97f76;
+<<<<<<< Updated upstream
     --onet:#e8756a; --ceds:#9a86e8; --ctdl:#e58bab; --schema:#5b9de8; --educore:#8fbf5f;
+=======
+    --ceds:#9a86e8; --ctdl:#e58bab; --schema:#5b9de8; --educor:#8fbf5f;
+>>>>>>> Stashed changes
     --display:"Bricolage Grotesque", Georgia, serif;
     --body:"Spline Sans", -apple-system, "Segoe UI", sans-serif;
     --mono:"Spline Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -262,7 +266,7 @@
   <main>
     <div id="stage">
       <canvas id="graph"></canvas>
-      <div class="stage-hint">five vocabularies · one graph · gold = the links you weave · underlined = our focus standards</div>
+      <div class="stage-hint">four vocabularies · one graph · gold = the links you weave · underlined = our focus standards</div>
     </div>
     <aside id="panel"></aside>
   </main>
@@ -272,7 +276,7 @@
   <div class="intro">
     <span class="eyebrow">An interactive field guide to federated ontologies</span>
     <h1>The Federation <span class="thread">Loom</span></h1>
-    <p>Five real vocabularies describe the same world of learning and work — and none of them agree. They never will. Your job isn't to merge them. It's to <em>weave</em> them: one RDF link at a time, until five maps behave like a single living graph.</p>
+    <p>Four real vocabularies describe the same world of learning and work — and none of them agree. They never will. Your job isn't to merge them. It's to <em>weave</em> them: one RDF link at a time, until four maps behave like a single living graph.</p>
     <div class="rules">
       <b>ACT I</b> &nbsp;Judge the joins — match concepts across vocabularies<br>
       <b>ACT II</b> &nbsp;Run federated queries across your threads<br>
@@ -287,6 +291,7 @@
 /* ════════════════════════ DATA ════════════════════════ */
 
 const CLUSTERS = {
+<<<<<<< Updated upstream
   onet:   { name:'O*NET',      full:'US Occupational Information Network',  color:'#e8756a', angle:-90  },
   ceds:   { name:'CEDS',       full:'Common Education Data Standards',      color:'#9a86e8', angle:-18, focus:true },
   ctdl:   { name:'CTDL',       full:'Credential Transparency Description Language', color:'#e58bab', angle:54, focus:true },
@@ -298,13 +303,23 @@ const NODES = [
   { id:'onet_dev',    c:'onet',   label:['15-1252 Software','Developers'], dx:2, dy:-46 },
   { id:'onet_prog',   c:'onet',   label:['Programming'],               dx:52,  dy:26  },
   { id:'onet_stat',   c:'onet',   label:['15-2041','Statisticians'],   dx:-52, dy:30, dim:true },
+=======
+  ceds:   { name:'CEDS',       full:'Common Education Data Standards',      color:'#9a86e8', angle:-135, focus:true },
+  ctdl:   { name:'CTDL',       full:'Credential Transparency Description Language', color:'#e58bab', angle:-45, focus:true },
+  educor: { name:'EduCOR',     full:'Education & Career Recommendation',    color:'#8fbf5f', angle:45 },
+  schema: { name:'schema.org', full:'The web’s shared vocabulary',     color:'#5b9de8', angle:135 },
+};
+
+const NODES = [
+>>>>>>> Stashed changes
   { id:'ceds_fname',  c:'ceds',   label:['First Name'],                dx:0,   dy:-48 },
   { id:'ceds_cred',   c:'ceds',   label:['Credential','Definition'],   dx:54,  dy:14  },
   { id:'ceds_cip',    c:'ceds',   label:['CS Program','(CIP 11.0701)'],dx:-54, dy:18  },
   { id:'ceds_course', c:'ceds',   label:['Course Section'],            dx:2,   dy:60, dim:true },
-  { id:'ctdl_cred',   c:'ctdl',   label:['Credential'],                dx:0,   dy:-44 },
-  { id:'ctdl_comp',   c:'ctdl',   label:['Competency'],                dx:48,  dy:24 },
-  { id:'ctdl_cert',   c:'ctdl',   label:['Certification'],             dx:-50, dy:22, dim:true },
+  { id:'ctdl_cred',   c:'ctdl',   label:['Credential'],                dx:0,   dy:-48 },
+  { id:'ctdl_comp',   c:'ctdl',   label:['Competency ⟨class⟩'],       dx:62,  dy:14 },
+  { id:'ctdl_prog',   c:'ctdl',   label:['Instructional Program','(CIP 11.0701)'], dx:-64, dy:18 },
+  { id:'ctdl_pgm',    c:'ctdl',   label:['“Programming”','⟨competency⟩'], dx:4, dy:62 },
   { id:'sch_given',   c:'schema', label:['givenName'],                 dx:0,   dy:-52 },
   { id:'sch_lr',      c:'schema', label:['LearningResource'],          dx:-58, dy:16 },
   { id:'sch_person',  c:'schema', label:['Person'],                    dx:6,   dy:64, dim:true },
@@ -315,9 +330,12 @@ const NODES = [
 ];
 
 const INTRA_EDGES = [
+<<<<<<< Updated upstream
   ['onet_dev','onet_prog'],['onet_prog','onet_stat'],
+=======
+>>>>>>> Stashed changes
   ['ceds_fname','ceds_cred'],['ceds_cred','ceds_course'],['ceds_course','ceds_cip'],
-  ['ctdl_cred','ctdl_cert'],['ctdl_cred','ctdl_comp'],
+  ['ctdl_cred','ctdl_comp'],['ctdl_cred','ctdl_prog'],['ctdl_comp','ctdl_pgm'],
   ['sch_given','sch_lr'],['sch_lr','sch_person'],['sch_given','sch_person'],
   ['edu_cip','edu_soc'],['edu_soc','edu_comp'],['edu_comp','edu_lr'],['edu_lr','edu_cip'],
 ];
@@ -349,10 +367,11 @@ const ROUNDS = [
     pair:'CEDS ↔ schema.org',
     triple:'ceds:FirstName owl:equivalentProperty schema:givenName .',
     why:'“First name” and “given name” are the same idea wearing two communities’ clothes. But these two are <em>properties</em>, not entries in a code list — so the loom records owl:equivalentProperty rather than a SKOS match. Every registrar transcript can now feed a web-readable profile.' },
-  { id:'r2', a:'ceds_cip', b:'onet_dev', best:'related',
-    scenario:'Maria’s degree program is coded in the registrar’s records. A career counselor wants to know which jobs it leads to.',
+  { id:'r2', a:'ceds_cip', b:'ctdl_prog', best:'exact',
+    scenario:'Maria’s degree program is coded in the registrar’s records. The public credential registry lists instructional programs too — coded from the very same federal list.',
     src:{ t:'Program of study — Computer Science', d:'Maria’s degree program, recorded with CIP code 11.0701.' },
     opts:[
+<<<<<<< Updated upstream
       { t:'“Software Developers” — the US occupation', d:'The job the program most directly feeds — with wage and outlook data.', ok:true },
       { t:'Programming — the skill',                   d:'Something the program teaches — not the occupation it leads to.' },
       { t:'“Statisticians” — the US occupation',       d:'Fed by statistics and mathematics programs — not on this program’s crosswalk.' },
@@ -374,12 +393,40 @@ const ROUNDS = [
     triple:'educore:soc_15-1252.00 skos:exactMatch onetsoc:15-1252.00 .',
     why:'Same code, same classification: EDUcore forged this node from O*NET-SOC 2019 and kept the code as its identity, so the two concepts are interchangeable and the loom records skos:exactMatch. Occupation codes are entries in a classification, so this is a SKOS match, not an OWL axiom. EDUcore’s 8,324 CIP→SOC crosswalk edges now flow straight into O*NET’s wage and outlook data.' },
   { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'eqclass',
+=======
+      { t:'Instructional program — CIP 11.0701', d:'The registry’s entry for the same NCES program code.', ok:true },
+      { t:'Credential',                           d:'What the program awards at the end — not the program.' },
+      { t:'Competency ⟨class⟩',                  d:'A kind of thing, not a program code at all.' },
+    ],
+    thread:'The program thread — the registrar’s CIP code joined to the registry’s',
+    pair:'CEDS ↔ CTDL',
+    triple:'ceds:CIP-11.0701 skos:exactMatch ctdlcip:11.0701 .',
+    why:'Both sides reuse the same NCES CIP list, so these are two registries’ <em>entries</em> for one concept — code-list entries, which is exactly what SKOS is for, and interchangeable, which makes it skos:exactMatch. Note what this is not: the two <em>schemas</em> stay untouched. One shared code, two vocabularies, one answerable question.' },
+  { id:'r3', a:'edu_python', b:'ctdl_pgm', best:'broad',
+    scenario:'A published competency framework names the abilities employers ask credentials to attest. A learner’s profile on the platform lists much more specific skills.',
+    src:{ t:'Python', d:'A skill the learning platform tracks — writing programs in the Python language.' },
+    opts:[
+      { t:'“Programming” ⟨competency⟩', d:'Writing computer programs in any language — the broader published competency.', ok:true },
+      { t:'Competency ⟨class⟩',        d:'The class all competencies belong to — not a competency itself.' },
+      { t:'Credential',                 d:'The award that attests competencies — not an ability.' },
+    ],
+    thread:'The skill-ladder thread — “Python” joined up to the broader “Programming”',
+    pair:'EduCOR ↔ CTDL-ASN',
+    triple:'educor:skill_python skos:broadMatch ctdlasn:programming .',
+    why:'Python is one way to program, so it joins upward — skos:broadMatch, read as “Python ⊆ Programming.” And notice the pairing with the competency thread: there you aligned two <em>classes</em> with an RDFS axiom; here you align two <em>entries</em> with a SKOS match. Same federation, two different kinds of thing.' },
+  { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'subclass',
+>>>>>>> Stashed changes
     scenario:'Maria’s diploma lives in the registrar’s records. The public credential registry describes credentials so the whole market can trust and compare them.',
     src:{ t:'Credential Definition', d:'CEDS’s class for a credential as defined — a qualification, achievement or quality used to indicate suitability — with US reporting fields.' },
     opts:[
       { t:'Credential — as the registry describes it', d:'A degree, badge or certificate, published for transparency and comparison.', ok:true },
+<<<<<<< Updated upstream
       { t:'Certification',                             d:'One kind of credential — a CTDL subclass, and a code in CEDS’s own Credential Type list — not the whole class.' },
       { t:'Competency',                                d:'What a credential attests — not the credential itself.' },
+=======
+      { t:'Instructional program — CIP 11.0701',      d:'The course of study that leads to the award — not the award.' },
+      { t:'Competency ⟨class⟩',                       d:'What a credential attests — not the credential itself.' },
+>>>>>>> Stashed changes
     ],
     thread:'The credential thread — the registrar’s credential definition joined to the credential registry’s',
     pair:'CEDS ↔ CTDL',
@@ -389,9 +436,15 @@ const ROUNDS = [
     scenario:'EDUcore keeps a forged copy of every standard it ingests. A competency query that starts inside EDUcore should land on the registry’s own class.',
     src:{ t:'Competency — as EDUcore holds it', d:'EDUcore’s forged node for CTDL-ASN’s Competency: native label kept, stableId ceasn:Competency, source CTDLASN.' },
     opts:[
+<<<<<<< Updated upstream
       { t:'Competency — what a credential attests', d:'The registry’s term for a demonstrable ability a credential can certify — knowledge, skills and abilities alike.', ok:true },
       { t:'Credential',                             d:'The award itself — not the ability it attests.' },
       { t:'Certification',                          d:'One kind of credential — still not the ability.' },
+=======
+      { t:'Competency ⟨class⟩ — what a credential attests', d:'The registry’s term for a demonstrable ability a credential can certify.', ok:true },
+      { t:'Credential',                                  d:'The award itself — not the ability it attests.' },
+      { t:'“Programming” ⟨competency⟩',                   d:'One particular competency — not the class all of them belong to.' },
+>>>>>>> Stashed changes
     ],
     thread:'The competency thread — EDUcore’s copy of a competency joined back to the registry’s',
     pair:'EDUcore ↔ CTDL',
@@ -420,15 +473,22 @@ const QUERIES = [
     why:'The query hops: her course section → the CEDS credential award it earned → its Credential Definition → across your owl:equivalentClass thread → the CTDL credential the registry describes. Neither side changed a field.',
     caveat:'Be precise about what this buys you. The thread aligns two <em>schemas</em> — CEDS’s Credential Definition and CTDL’s Credential both describe a <em>kind</em> of credential — so the query can ask “what kind of credential is this, and what does the registry say that kind attests?” It does <b>not</b> verify Maria’s particular diploma. That lives in CEDS’s Credential Award, a class the registry has no counterpart for, and takes an issuer-signed credential or an instance published in the registry by the issuer. Alignment makes the question askable; provenance answers it.' },
   { need:'r2',
-    title:'The program that points to a paycheck',
-    text:'Maria’s transcript shows a Computer Science program. A career counselor wants to show her the occupations it leads to — with wage and outlook data. <b>Which thread answers it?</b>',
-    path:['ceds_course','ceds_cip','onet_dev'],
-    why:'Her course sections roll up to the program of study, and your relatedMatch thread carries the query into O*NET’s “Software Developers” — where the wages and outlook live. One link, education to labour market, zero schema changes.' },
+    title:'The program that points to every award',
+    text:'Maria’s transcript shows a Computer Science program and nothing more. An advisor wants the full market picture for that program — every certificate, badge and degree other providers publish against the same code. <b>Which thread answers it?</b>',
+    path:['ceds_course','ceds_cip','ctdl_prog'],
+    why:'Her course sections roll up to the program of study, and your exactMatch thread carries the query across to the registry’s entry for CIP 11.0701 — where every published credential tagged to that program is waiting. One shared code, two registries, zero schema changes.' },
   { need:'r3',
+<<<<<<< Updated upstream
     title:'The crosswalk that asks for a paycheck',
     text:'EDUcore already holds the NCES crosswalk: Maria’s Computer Science program (CIP 11.0701) sits one CLASSIFICATION_CROSSWALK edge from 26 occupations, Software Developers among them. The counselor wants to rank those occupations by median wage — data EDUcore does not store. <b>Which thread lets the query step out for it?</b>',
     path:['edu_cip','edu_soc','onet_dev'],
     why:'The query walks EDUcore’s own crosswalk from the program to SOC 15-1252, then rides your exactMatch thread into O*NET’s record of the same occupation — where the wages and outlook live. EDUcore stayed a graph of standards, the labour-market numbers stayed in O*NET, and the question got answered anyway.' },
+=======
+    title:'The recommender looks outward',
+    text:'The learning platform wants to recommend a course teaching an ability that <em>published competency frameworks</em> actually name — which the platform itself doesn’t track. <b>Which thread powers the recommendation?</b>',
+    path:['edu_path','edu_python','ctdl_pgm'],
+    why:'The learning path names the platform’s “Python” skill; your broadMatch thread joins it up to the published “Programming” competency — and from there to every credential that attests it. The recommender just got smarter without adding one field to its own ontology.' },
+>>>>>>> Stashed changes
 ];
 
 /* thresholds are fractions of the max score for the mode played */
@@ -436,7 +496,7 @@ const RANKS = [
   [0,   'Silo Dweller',        'Your data is safe. Also alone. Weave again?'],
   [0.4, 'Crosswalk Apprentice','You can see the bridges now. The precision comes with practice.'],
   [0.7, 'Linked-Data Weaver',  'Your threads hold weight. Query engines trust you.'],
-  [0.9, 'Federation Architect','Five vocabularies, one living graph. The loom is yours.'],
+  [0.9, 'Federation Architect','Four vocabularies, one living graph. The loom is yours.'],
 ];
 
 /* ════════════════════════ STATE ════════════════════════ */
@@ -654,9 +714,9 @@ function renderPrologue(){
   actTag.textContent='PROLOGUE';
   panel.innerHTML = `
     <div>
-      <span class="eyebrow">Prologue · Why five maps?</span>
-      <h2>One territory. Five maps. Forever.</h2>
-      <p class="lede">Each vocabulary on the graph was drawn by a different community, to answer that community’s own questions. The registrar (<b style="color:var(--ceds)">CEDS</b>) asks “did Maria earn the credits?” The public credential registry (<b style="color:#e58bab">CTDL</b>) asks “can an employer trust what her diploma claims?” The occupation data bank (O*NET) asks “what do these jobs pay, and what skills do they need?” The two underlined on the graph — CEDS and CTDL — are the standards this loom is really about.</p>
+      <span class="eyebrow">Prologue · Why four maps?</span>
+      <h2>One territory. Four maps. Forever.</h2>
+      <p class="lede">Each vocabulary on the graph was drawn by a different community, to answer that community’s own questions. The registrar (<b style="color:var(--ceds)">CEDS</b>) asks “did Maria earn the credits?” The public credential registry (<b style="color:#e58bab">CTDL</b>) asks “can an employer trust what her diploma claims?” The learning platform (<b style="color:var(--educor)">EduCOR</b>) asks “what should she study next?” The open web (<b style="color:var(--schema)">schema.org</b>) asks “how do I describe any of this to a search engine?” The two underlined on the graph — CEDS and CTDL — are the standards this loom is really about.</p>
     </div>
     <div class="card" style="font-size:13.5px; color:var(--muted)">
       A single merged mega-ontology would have to answer <em>everyone’s</em> questions — which is how it ends up answering no one’s. Multiple ontologies aren’t a failure of coordination; they’re fitness. They will always exist.
@@ -664,7 +724,7 @@ function renderPrologue(){
     </div>
     <div class="card" style="font-size:13.5px; color:var(--muted)">
       <span class="eyebrow" style="display:block; margin-bottom:8px">Two kinds of thread, because two kinds of thing</span>
-      <div><b style="color:var(--text)">Concepts</b> — the entries in a code list or taxonomy, like a CIP program code or an O*NET skill — join with SKOS: <span style="font-family:var(--mono); color:var(--gold)">exactMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">broadMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">relatedMatch</span>.</div>
+      <div><b style="color:var(--text)">Concepts</b> — the entries in a code list or taxonomy, like a CIP program code or a published competency — join with SKOS: <span style="font-family:var(--mono); color:var(--gold)">exactMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">broadMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">relatedMatch</span>.</div>
       <div style="margin-top:6px"><b style="color:var(--text)">Classes and properties</b> — the structure of an ontology, like <span style="font-family:var(--mono)">ceds:Credential</span> — join with OWL and RDFS: <span style="font-family:var(--mono); color:var(--gold)">equivalentClass</span>, <span style="font-family:var(--mono); color:var(--gold)">subClassOf</span>, <span style="font-family:var(--mono); color:var(--gold)">equivalentProperty</span>.</div>
       <div style="margin-top:6px">SKOS mapping properties are defined to hold between instances of <span style="font-family:var(--mono)">skos:Concept</span>. Reaching for one between two classes is the most common way a crosswalk goes subtly wrong — the loom won’t do it.</div>
     </div>
@@ -824,7 +884,11 @@ function renderEnd(){
     ${S.mode==='quick' ? `<button class="btn-primary" id="expand">Play the expanded loom — 6 joins · 3 queries</button>
     <button id="again" style="text-align:center">Weave the quick game again</button>`
     : `<button class="btn-primary" id="again">Weave again</button>`}
+<<<<<<< Updated upstream
     <p class="credits">Grounded in real vocabularies: <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://credreg.net/" target="_blank" rel="noopener">CTDL</a> · <a href="https://www.onetonline.org/" target="_blank" rel="noopener">O*NET</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · EDUcore (the education standards knowledge graph), linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a> and <a href="https://www.w3.org/TR/owl2-overview/" target="_blank" rel="noopener">OWL</a>/RDFS. The CIP→SOC crosswalk is real and published by NCES. Nothing here is saved — close the tab and the loom forgets you.</p>`;
+=======
+    <p class="credits">Grounded in real vocabularies: <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://credreg.net/" target="_blank" rel="noopener">CTDL</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · <a href="https://arxiv.org/abs/2107.05522" target="_blank" rel="noopener">EduCOR</a>, linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a> and <a href="https://www.w3.org/TR/owl2-overview/" target="_blank" rel="noopener">OWL</a>/RDFS. CIP program codes are real, published by NCES, and used by both CEDS and CTDL. Nothing here is saved — close the tab and the loom forgets you.</p>`;
+>>>>>>> Stashed changes
   const reset = mode => {
     Object.assign(S, { mode, score:0, shownScore:0, richness:0,
       roundIdx:0, act2Score:0, bestCount:0, queryIdx:0, act3Score:0, queryRight:0,
@@ -842,8 +906,8 @@ function renderEnd(){
 panel.innerHTML = `
   <div>
     <span class="eyebrow">Prologue</span>
-    <h2>Five maps of one territory</h2>
-    <p class="lede">The graph beside you shows five real US-focused vocabularies that describe learning and work — with CEDS and CTDL, the credential standards, underlined in gold. Right now, nothing connects them — a question asked in one cannot be answered by another.</p>
+    <h2>Four maps of one territory</h2>
+    <p class="lede">The graph beside you shows four real US-focused vocabularies that describe learning and work — with CEDS and CTDL, the credential standards, underlined in gold. Right now, nothing connects them — a question asked in one cannot be answered by another.</p>
   </div>
   <div class="card" style="color:var(--muted); font-size:13.5px">Press <b style="color:var(--text)">Sit at the loom</b> to begin.</div>`;
 

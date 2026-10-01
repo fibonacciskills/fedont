@@ -7,10 +7,19 @@ living, richer graph.
 Play in two acts across four real US-focused vocabularies — CEDS and CTDL (the focus
 standards, underlined in gold on the graph) plus schema.org and EDUcore:
 
-- **Prologue.** A brief read on why multiple ontologies exist (and always will), and how to play.
+- **Welcome + guided tour.** A three-line welcome, then five popovers pinned to the real
+  interface — what a cluster is, what a dot is, where you answer, what a right answer does.
+  The tour layer never swallows clicks, so it hints rather than gates; `Skip`, `Esc` or
+  `Got it` ends it, and the **?** in the top bar replays it at any point.
+- **Prologue.** Short: why multiple ontologies exist (and always will), plus the one rule
+  the game grades on — concepts take SKOS, classes and properties take OWL/RDFS.
 - **Act I — The Weave.** Judge which term in another vocabulary each term joins to;
   the loom weaves each connection as a visible RDF link on the graph.
 - **Act II — The Harvest.** Run federated queries that only work across the links you wove.
+
+Replaying the tour mid-game adds a sixth popover, *How to pick well*, anchored to the
+answer buttons — it restates the SKOS-versus-OWL rule where it is actually needed. That
+step is absent from the opening tour, which has no answers on screen yet.
 
 ### Which link for which thing
 

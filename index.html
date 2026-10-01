@@ -237,6 +237,57 @@
   }
   .intro .rules b{color:var(--gold); font-weight:500}
 
+  .intro-foot{
+    font-family:var(--mono); font-size:10.5px; color:#5c6280;
+    text-align:center; letter-spacing:.06em;
+  }
+
+  /* ── guided tour ─────────────────────── */
+  .help-btn{
+    width:22px; height:22px; padding:0; border-radius:50%;
+    font-family:var(--mono); font-size:11px; line-height:1; text-align:center;
+    color:var(--muted); background:var(--panel2); border:1px solid var(--line);
+    margin-left:10px; flex:0 0 auto;
+  }
+  .help-btn:hover{color:var(--gold); border-color:var(--gold); background:var(--panel2)}
+  #tour[hidden]{display:none}
+  #tour{position:fixed; inset:0; z-index:20; pointer-events:none}
+  .tour-ring{
+    position:absolute; border:1.5px solid var(--gold); border-radius:12px;
+    box-shadow:0 0 0 9999px rgba(11,13,24,.6), 0 0 26px rgba(226,168,75,.3);
+    transition:left .34s cubic-bezier(.4,0,.2,1), top .34s cubic-bezier(.4,0,.2,1),
+               width .34s cubic-bezier(.4,0,.2,1), height .34s cubic-bezier(.4,0,.2,1);
+  }
+  .tour-pop{
+    position:absolute; pointer-events:auto;
+    width:292px; max-width:calc(100vw - 28px);
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:15px 17px; box-shadow:0 22px 56px rgba(0,0,0,.6);
+    display:flex; flex-direction:column; gap:7px;
+    transition:left .34s cubic-bezier(.4,0,.2,1), top .34s cubic-bezier(.4,0,.2,1);
+  }
+  .tour-pop h3{
+    font-family:var(--display); font-weight:700; font-size:16.5px;
+    margin:0; line-height:1.2; color:var(--text);
+  }
+  .tour-pop p{margin:0; font-size:13px; color:var(--muted); line-height:1.55}
+  .tour-foot{display:flex; align-items:center; gap:8px; margin-top:4px}
+  .tour-count{
+    font-family:var(--mono); font-size:10px; color:#5c6280; letter-spacing:.12em;
+  }
+  .tour-foot .spacer{margin-left:auto}
+  .tour-skip{
+    width:auto; font-size:12px; color:#6a7092; background:none;
+    border:none; padding:4px 2px;
+  }
+  .tour-skip:hover{color:var(--text); background:none; border:none}
+  .tour-next{
+    width:auto; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    padding:7px 15px; text-align:center;
+    background:var(--gold); border-color:var(--gold); color:#241a08;
+  }
+  .tour-next:hover{background:#eebb62; border-color:#eebb62}
+
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.01ms !important; transition-duration:.01ms !important}
   }
@@ -248,6 +299,7 @@
   <header class="topbar">
     <div class="wordmark">The Federation <span class="thread">Loom</span></div>
     <div class="act-tag" id="actTag">PROLOGUE</div>
+    <button class="help-btn" id="helpBtn" title="How to play" aria-label="How to play">?</button>
     <div class="hud">
       <div class="hud-block richness">
         <span class="hud-label">Questions answerable</span>
@@ -268,17 +320,20 @@
   </main>
 </div>
 
+<div id="tour" hidden></div>
+
 <div id="overlay">
   <div class="intro">
     <span class="eyebrow">An interactive field guide to federated ontologies</span>
     <h1>The Federation <span class="thread">Loom</span></h1>
-    <p>Four real vocabularies describe the same world of learning and work — and none of them agree. They never will. Your job isn't to merge them. It's to <em>weave</em> them: one RDF link at a time, until four maps behave like a single living graph.</p>
+    <p>Four standards describe the same world of learning and work, and none of them agree. You are not going to merge them — you are going to <em>weave</em> them, one RDF link at a time.</p>
     <div class="rules">
-      <b>ACT I</b> &nbsp;Judge the joins — match concepts across vocabularies<br>
-      <b>ACT II</b> &nbsp;Run federated queries across your threads<br>
-      No login. Nothing saved. Just you and the loom.
+      <b>1</b> &nbsp;Look at one term from one vocabulary<br>
+      <b>2</b> &nbsp;Pick the term it joins to in another<br>
+      <b>3</b> &nbsp;Run queries along the threads you wove
     </div>
-    <button class="btn-primary" id="beginBtn">Sit at the loom</button>
+    <button class="btn-primary" id="beginBtn">Show me the graph</button>
+    <div class="intro-foot">a few minutes · no login · nothing saved</div>
   </div>
 </div>
 
@@ -652,25 +707,13 @@ function renderPrologue(){
     <div>
       <span class="eyebrow">Prologue · Why four maps?</span>
       <h2>One territory. Four maps. Forever.</h2>
-      <p class="lede">Each vocabulary on the graph was drawn by a different community, to answer that community’s own questions. The registrar (<b style="color:var(--ceds)">CEDS</b>) asks “did Maria earn the credits?” The public credential registry (<b style="color:#e58bab">CTDL</b>) asks “can an employer trust what her diploma claims?” The standards knowledge graph (<b style="color:var(--educore)">EDUcore</b>) asks “where does any of this line up with any of the rest?” The two underlined on the graph — CEDS and CTDL — are the standards this loom is really about.</p>
+      <p class="lede">Each vocabulary was drawn by a different community to answer that community’s own questions — the registrar (<b style="color:var(--ceds)">CEDS</b>) asks “did Maria earn the credits?”, the credential registry (<b style="color:#e58bab">CTDL</b>) asks “can an employer trust what her diploma claims?” A single merged mega-ontology would have to answer <em>everyone’s</em>, which is how it ends up answering no one’s. They will always exist — but RDF lets them point at each other.</p>
     </div>
     <div class="card" style="font-size:13.5px; color:var(--muted)">
-      A single merged mega-ontology would have to answer <em>everyone’s</em> questions — which is how it ends up answering no one’s. Multiple ontologies aren’t a failure of coordination; they’re fitness. They will always exist.
-      <div style="margin-top:8px; color:var(--text)">But RDF lets separate vocabularies point at each other. One small link — <span style="font-family:var(--mono); color:var(--gold)">this term joins that one</span> — and questions start flowing across the walls.</div>
-    </div>
-    <div class="card" style="font-size:13.5px; color:var(--muted)">
-      <span class="eyebrow" style="display:block; margin-bottom:8px">Two kinds of thread, because two kinds of thing</span>
-      <div><b style="color:var(--text)">Concepts</b> — the entries in a code list or taxonomy, like a CIP program code or a SOC occupation — join with SKOS: <span style="font-family:var(--mono); color:var(--gold)">exactMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">broadMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">relatedMatch</span>.</div>
-      <div style="margin-top:6px"><b style="color:var(--text)">Classes and properties</b> — the structure of an ontology, like <span style="font-family:var(--mono)">ceds:Credential</span> — join with OWL and RDFS: <span style="font-family:var(--mono); color:var(--gold)">equivalentClass</span>, <span style="font-family:var(--mono); color:var(--gold)">subClassOf</span>, <span style="font-family:var(--mono); color:var(--gold)">equivalentProperty</span>.</div>
-      <div style="margin-top:6px">SKOS mapping properties are defined to hold between instances of <span style="font-family:var(--mono)">skos:Concept</span>. Reaching for one between two classes is the most common way a crosswalk goes subtly wrong — the loom won’t do it.</div>
-    </div>
-    <div class="card">
-      <span class="eyebrow" style="display:block; margin-bottom:8px">How to play</span>
-      <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px">
-        <div><b>Act I · The Weave.</b> You’re shown a concept from one vocabulary. Pick the concept it joins to in another. Every join weaves a gold thread onto the graph (+100) and lights up the “questions answerable” meter.</div>
-        <div><b>Act II · The Harvest.</b> Federated queries travel your threads. Send each one down the right thread (+100) and watch it cross the graph.</div>
-        <div style="color:var(--muted)">You’ll start with the quick game — three joins, two queries. The expanded loom unlocks after your first verdict.</div>
-      </div>
+      <span class="eyebrow" style="display:block; margin-bottom:8px">The one rule that matters</span>
+      <div><b style="color:var(--text)">Concepts</b> — entries in a code list, like a CIP program code or a SOC occupation — join with SKOS: <span style="font-family:var(--mono); color:var(--gold)">exactMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">broadMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">relatedMatch</span>.</div>
+      <div style="margin-top:6px"><b style="color:var(--text)">Classes and properties</b> — the structure itself, like <span style="font-family:var(--mono)">ceds:Credential</span> — join with OWL and RDFS: <span style="font-family:var(--mono); color:var(--gold)">equivalentClass</span>, <span style="font-family:var(--mono); color:var(--gold)">subClassOf</span>, <span style="font-family:var(--mono); color:var(--gold)">equivalentProperty</span>.</div>
+      <div style="margin-top:7px; color:#7d84a6">Reaching for a SKOS match between two classes is the most common way a published crosswalk goes subtly wrong. The loom won’t do it — and neither should you.</div>
     </div>
     <button class="btn-primary" id="toAct1">Pick up the golden thread → Act I</button>`;
   document.getElementById('toAct1').addEventListener('click', ()=>{ S.roundIdx=0; renderAct2(); });
@@ -834,18 +877,122 @@ function renderEnd(){
   if (ex) ex.addEventListener('click', ()=>reset('full'));
 }
 
+/* ════════════════════════ GUIDED TOUR ════════════════════════ */
+/* Five popovers pinned to the real UI — they replace the “how to play” wall of text.
+   The layer never swallows clicks, so the tour is a hint and not a gate. */
+
+const TOUR = [
+  { at:()=>clusterRect('ceds'), side:'right',
+    h:'Each cloud is a vocabulary',
+    p:'Four real standards, drawn by four different communities. This one is CEDS — how a school registrar records students, courses and credentials.' },
+  { at:()=>clusterRect('ctdl'), side:'left',
+    h:'Two of them are the point',
+    p:'CTDL is the public credential registry. It and CEDS are the two underlined in gold — the standards this loom is really about. The other two are here because they join to them.' },
+  { at:()=>nodeRect('ceds_cred'), side:'right',
+    h:'Each dot is one term',
+    p:'A class, a property, or an entry in a code list. Look at the gaps between the clouds: nothing crosses yet. That is the whole problem.' },
+  { at:()=>elRect('#panel'), side:'left',
+    h:'You answer over here',
+    p:'You get one term and three candidates from another vocabulary. Pick the one it joins to. There is a best answer every time — and you get the reasoning whether you find it or not.' },
+  { at:()=>elRect('.hud'), side:'below',
+    h:'A right answer weaves',
+    p:'A gold thread is drawn across the graph, you score, and one segment of “questions answerable” lights up. In Act II, real queries travel the threads you wove — and only those.' },
+  /* only resolves once a round is on screen, so it is absent from the opening tour
+     and present whenever the player hits ? mid-game */
+  { at:()=>elRect('.choice-list'), side:'left',
+    h:'How to pick well',
+    p:'Ask what kind of thing you are joining. Entries in a code list take a SKOS match — exactMatch, broadMatch, relatedMatch. Classes and properties take an OWL or RDFS axiom — equivalentClass, subClassOf, equivalentProperty. Mixing the two is the usual way a crosswalk goes wrong.' },
+];
+
+const tourEl = document.getElementById('tour');
+let tourIdx = 0, tourSteps = [];
+
+function elRect(sel){
+  const e = document.querySelector(sel);
+  if (!e) return null;
+  const r = e.getBoundingClientRect();
+  return { left:r.left, top:r.top, width:r.width, height:r.height };
+}
+function clusterRect(key){
+  const st = document.getElementById('stage').getBoundingClientRect();
+  const c  = clusterCenter(key, st.width, st.height);
+  const r  = Math.min(st.width, st.height)*0.2;
+  return { left:st.left+c.x-r, top:st.top+c.y-r, width:r*2, height:r*2 };
+}
+function nodeRect(id){
+  const st = document.getElementById('stage').getBoundingClientRect();
+  const n  = nodeById[id];
+  const c  = clusterCenter(n.c, st.width, st.height);
+  const sc = Math.min(st.width, st.height)/640, pad = 34;
+  return { left:st.left+c.x+n.dx*sc-pad, top:st.top+c.y+n.dy*sc-pad,
+           width:pad*2, height:pad*2+14 };
+}
+function placePop(pop, r, side){
+  const W = pop.offsetWidth||292, H = pop.offsetHeight||160, M = 14;
+  let left, top;
+  if (side==='right')      { left=r.left+r.width+M;     top=r.top+r.height/2-H/2; }
+  else if (side==='left')  { left=r.left-W-M;           top=r.top+r.height/2-H/2; }
+  else if (side==='below') { left=r.left+r.width/2-W/2; top=r.top+r.height+M; }
+  else                     { left=r.left+r.width/2-W/2; top=r.top-H-M; }
+  pop.style.left = Math.max(M, Math.min(left, innerWidth -W-M))+'px';
+  pop.style.top  = Math.max(M, Math.min(top,  innerHeight-H-M))+'px';
+}
+function drawTour(){
+  const step = tourSteps[tourIdx], r = step && step.at();
+  if (!r) return nextTour();
+  const ring = tourEl.querySelector('.tour-ring'), pop = tourEl.querySelector('.tour-pop');
+  ring.style.left = r.left+'px';   ring.style.top    = r.top+'px';
+  ring.style.width = r.width+'px'; ring.style.height = r.height+'px';
+  pop.querySelector('h3').textContent = step.h;
+  pop.querySelector('p').textContent  = step.p;
+  pop.querySelector('.tour-count').textContent = (tourIdx+1)+' / '+tourSteps.length;
+  pop.querySelector('.tour-next').textContent  = tourIdx===tourSteps.length-1 ? 'Got it' : 'Next';
+  placePop(pop, r, step.side);
+}
+function nextTour(){ tourIdx++; tourIdx<tourSteps.length ? drawTour() : endTour(); }
+function endTour(){ tourEl.hidden = true; }
+function startTour(){
+  tourSteps = TOUR.filter(st=>st.at());
+  if (!tourSteps.length) return;
+  tourIdx = 0;
+  tourEl.hidden = false;
+  tourEl.innerHTML = `
+    <div class="tour-ring"></div>
+    <div class="tour-pop">
+      <h3></h3><p></p>
+      <div class="tour-foot">
+        <span class="tour-count"></span>
+        <button class="tour-skip">Skip</button>
+        <span class="spacer"></span>
+        <button class="tour-next"></button>
+      </div>
+    </div>`;
+  tourEl.querySelector('.tour-skip').addEventListener('click', endTour);
+  tourEl.querySelector('.tour-next').addEventListener('click', nextTour);
+  drawTour();
+}
+addEventListener('resize', ()=>{ if(!tourEl.hidden) drawTour(); });
+addEventListener('keydown', e=>{
+  if (tourEl.hidden) return;
+  if (e.key==='Escape') endTour();
+  else if (e.key==='ArrowRight' || e.key==='Enter') nextTour();
+});
+document.getElementById('helpBtn').addEventListener('click', ()=>{
+  tourEl.hidden ? startTour() : endTour();
+});
+
 /* ── intro ── */
 panel.innerHTML = `
   <div>
     <span class="eyebrow">Prologue</span>
     <h2>Four maps of one territory</h2>
-    <p class="lede">The graph beside you shows four real US-focused vocabularies that describe learning and work — with CEDS and CTDL, the credential standards, underlined in gold. Right now, nothing connects them — a question asked in one cannot be answered by another.</p>
-  </div>
-  <div class="card" style="color:var(--muted); font-size:13.5px">Press <b style="color:var(--text)">Sit at the loom</b> to begin.</div>`;
+    <p class="lede">Four real vocabularies for learning and work. Right now nothing connects them — a question asked in one cannot be answered by another.</p>
+  </div>`;
 
 document.getElementById('beginBtn').addEventListener('click', ()=>{
   document.getElementById('overlay').classList.add('gone');
   renderPrologue();
+  setTimeout(startTour, 430);
 });
 </script>
 </body>

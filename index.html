@@ -21,7 +21,7 @@
     --good:#7fc98a;
     --warn:#e0b458;
     --bad:#d97f76;
-    --onet:#e8756a; --ceds:#9a86e8; --ctdl:#e58bab; --schema:#5b9de8; --educor:#8fbf5f;
+    --onet:#e8756a; --ceds:#9a86e8; --ctdl:#e58bab; --schema:#5b9de8; --educore:#8fbf5f;
     --display:"Bricolage Grotesque", Georgia, serif;
     --body:"Spline Sans", -apple-system, "Segoe UI", sans-serif;
     --mono:"Spline Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -291,15 +291,15 @@ const CLUSTERS = {
   ceds:   { name:'CEDS',       full:'Common Education Data Standards',      color:'#9a86e8', angle:-18, focus:true },
   ctdl:   { name:'CTDL',       full:'Credential Transparency Description Language', color:'#e58bab', angle:54, focus:true },
   schema: { name:'schema.org', full:'The web’s shared vocabulary',     color:'#5b9de8', angle:126 },
-  educor: { name:'EduCOR',     full:'Education & Career Recommendation',    color:'#8fbf5f', angle:198 },
+  educore:{ name:'EDUcore',    full:'Education standards knowledge graph',   color:'#8fbf5f', angle:198 },
 };
 
 const NODES = [
   { id:'onet_dev',    c:'onet',   label:['15-1252 Software','Developers'], dx:2, dy:-46 },
   { id:'onet_prog',   c:'onet',   label:['Programming'],               dx:52,  dy:26  },
-  { id:'onet_ds',     c:'onet',   label:['15-2051 Data','Scientists'], dx:-52, dy:30, dim:true },
+  { id:'onet_stat',   c:'onet',   label:['15-2041','Statisticians'],   dx:-52, dy:30, dim:true },
   { id:'ceds_fname',  c:'ceds',   label:['First Name'],                dx:0,   dy:-48 },
-  { id:'ceds_cred',   c:'ceds',   label:['Credential'],                dx:54,  dy:14  },
+  { id:'ceds_cred',   c:'ceds',   label:['Credential','Definition'],   dx:54,  dy:14  },
   { id:'ceds_cip',    c:'ceds',   label:['CS Program','(CIP 11.0701)'],dx:-54, dy:18  },
   { id:'ceds_course', c:'ceds',   label:['Course Section'],            dx:2,   dy:60, dim:true },
   { id:'ctdl_cred',   c:'ctdl',   label:['Credential'],                dx:0,   dy:-44 },
@@ -308,18 +308,18 @@ const NODES = [
   { id:'sch_given',   c:'schema', label:['givenName'],                 dx:0,   dy:-52 },
   { id:'sch_lr',      c:'schema', label:['LearningResource'],          dx:-58, dy:16 },
   { id:'sch_person',  c:'schema', label:['Person'],                    dx:6,   dy:64, dim:true },
-  { id:'edu_skill',   c:'educor', label:['Skill ⟨class⟩'],   dx:0,   dy:-46 },
-  { id:'edu_res',     c:'educor', label:['Educational','Resource'],    dx:54,  dy:16 },
-  { id:'edu_python',  c:'educor', label:['“Python”'],                  dx:-54, dy:20 },
-  { id:'edu_path',    c:'educor', label:['LearningPath'],              dx:2,   dy:62, dim:true },
+  { id:'edu_soc',     c:'educore', label:['15-1252 Software','Developers ⟨SOC⟩'], dx:0, dy:-46 },
+  { id:'edu_comp',    c:'educore', label:['Competency','⟨CTDL-ASN⟩'],   dx:54,  dy:16 },
+  { id:'edu_lr',      c:'educore', label:['Learning Resource','⟨CEDS⟩'], dx:-54, dy:20 },
+  { id:'edu_cip',     c:'educore', label:['CS Program','⟨CIP 11.0701⟩'], dx:2,   dy:62, dim:true },
 ];
 
 const INTRA_EDGES = [
-  ['onet_dev','onet_prog'],['onet_prog','onet_ds'],
+  ['onet_dev','onet_prog'],['onet_prog','onet_stat'],
   ['ceds_fname','ceds_cred'],['ceds_cred','ceds_course'],['ceds_course','ceds_cip'],
   ['ctdl_cred','ctdl_cert'],['ctdl_cred','ctdl_comp'],
   ['sch_given','sch_lr'],['sch_lr','sch_person'],['sch_given','sch_person'],
-  ['edu_skill','edu_res'],['edu_res','edu_path'],['edu_skill','edu_python'],['edu_path','edu_python'],
+  ['edu_cip','edu_soc'],['edu_soc','edu_comp'],['edu_comp','edu_lr'],['edu_lr','edu_cip'],
 ];
 
 const PREDS = {
@@ -355,60 +355,60 @@ const ROUNDS = [
     opts:[
       { t:'“Software Developers” — the US occupation', d:'The job the program most directly feeds — with wage and outlook data.', ok:true },
       { t:'Programming — the skill',                   d:'Something the program teaches — not the occupation it leads to.' },
-      { t:'“Data Scientists” — the US occupation',     d:'Fed by statistics and data-science programs, not this one.' },
+      { t:'“Statisticians” — the US occupation',       d:'Fed by statistics and mathematics programs — not on this program’s crosswalk.' },
     ],
     thread:'The pathway thread — the registrar’s program of study joined to the occupation it leads to',
     pair:'CEDS ↔ O*NET',
     triple:'ceds:CIP-11.0701 skos:relatedMatch onetsoc:15-1252.00 .',
-    why:'This is the real NCES CIP→SOC crosswalk: programs of study mapped to the occupations they prepare people for. A program isn’t an occupation, so the loom records skos:relatedMatch — associated, neither equivalent nor broader. Education just joined the labour market.' },
-  { id:'r3', a:'edu_python', b:'onet_prog', best:'broad',
-    scenario:'An employer’s posting asks for general skills. A learner’s profile on the platform lists specific ones.',
-    src:{ t:'Python', d:'A skill the learning platform tracks — writing programs in the Python language.' },
+    why:'This is the real NCES CIP→SOC crosswalk: programs of study mapped to the occupations they prepare people for — CIP 11.0701 maps to 26 of them, and Software Developers is one. A program isn’t an occupation, so the loom records skos:relatedMatch — associated, neither equivalent nor broader. Education just joined the labour market.' },
+  { id:'r3', a:'edu_soc', b:'onet_dev', best:'exact',
+    scenario:'EDUcore carries the NCES crosswalk from programs to occupations — but no wages. A counselor’s tool needs to step from an EDUcore occupation to O*NET’s live wage and outlook pages.',
+    src:{ t:'Software Developers — SOC 15-1252', d:'EDUcore’s forged O*NET-SOC 2019 occupation: job zone 4, dozens of alternate titles — and not one wage figure.' },
     opts:[
-      { t:'Programming',                        d:'Writing computer programs in any language — the broader skill.', ok:true },
-      { t:'“Software Developers” — the US job', d:'A job that uses the skill — not the skill itself.' },
-      { t:'“Data Scientists” — the US job',     d:'Also a job, not a skill.' },
+      { t:'“Software Developers” — the US occupation', d:'The same code in O*NET’s own database — where wages and outlook live.', ok:true },
+      { t:'Programming — the skill',                   d:'A skill the occupation uses — not the occupation.' },
+      { t:'“Statisticians” — the US occupation',       d:'A different code, 15-2041 — a different job.' },
     ],
-    thread:'The skill-ladder thread — “Python” joined up to the broader “Programming”',
-    pair:'EduCOR ↔ O*NET',
-    triple:'educor:skill_python skos:broadMatch onet:Programming .',
-    why:'Python is one way to program, so it joins upward to the broader concept — the loom records skos:broadMatch, read as “Python ⊆ Programming.” Specific skills connecting to general demand is exactly how learner profiles meet job ads.' },
-  { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'subclass',
+    thread:'The crosswalk thread — EDUcore’s occupation joined to O*NET’s own',
+    pair:'EDUcore ↔ O*NET',
+    triple:'educore:soc_15-1252.00 skos:exactMatch onetsoc:15-1252.00 .',
+    why:'Same code, same classification: EDUcore forged this node from O*NET-SOC 2019 and kept the code as its identity, so the two concepts are interchangeable and the loom records skos:exactMatch. Occupation codes are entries in a classification, so this is a SKOS match, not an OWL axiom. EDUcore’s 8,324 CIP→SOC crosswalk edges now flow straight into O*NET’s wage and outlook data.' },
+  { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'eqclass',
     scenario:'Maria’s diploma lives in the registrar’s records. The public credential registry describes credentials so the whole market can trust and compare them.',
-    src:{ t:'Credential', d:'A qualification awarded by an education institution — with US reporting fields.' },
+    src:{ t:'Credential Definition', d:'CEDS’s class for a credential as defined — a qualification, achievement or quality used to indicate suitability — with US reporting fields.' },
     opts:[
       { t:'Credential — as the registry describes it', d:'A degree, badge or certificate, published for transparency and comparison.', ok:true },
-      { t:'Certification',                             d:'One kind of credential, awarded by industry bodies — not the whole class.' },
+      { t:'Certification',                             d:'One kind of credential — a CTDL subclass, and a code in CEDS’s own Credential Type list — not the whole class.' },
       { t:'Competency',                                d:'What a credential attests — not the credential itself.' },
     ],
-    thread:'The credential thread — the registrar’s credential joined to the credential registry’s',
+    thread:'The credential thread — the registrar’s credential definition joined to the credential registry’s',
     pair:'CEDS ↔ CTDL',
-    triple:'ceds:Credential rdfs:subClassOf ceterms:Credential .',
-    why:'CEDS models credentials for education agencies; CTDL — the Credential Transparency Description Language — models them so employers and learners can compare and trust them. Both are <em>classes</em>, so the join is an OWL/RDFS axiom rather than a SKOS match — and CTDL’s Credential is the wider of the two (it also covers certifications, licences and badges), so the honest claim is rdfs:subClassOf. The registrar’s credential records can now be read in the registry’s terms.' },
-  { id:'r5', a:'edu_skill', b:'ctdl_comp', best:'subclass',
-    scenario:'The learning platform wants its skills to line up with what credentials officially attest.',
-    src:{ t:'Skill — as the platform tracks it', d:'A learner’s ability, tracked to recommend what to learn next.' },
+    triple:'ceds:CredentialDefinition owl:equivalentClass\n    ceterms:Credential .',
+    why:'CEDS models credentials for education agencies; CTDL — the Credential Transparency Description Language — models them so employers and learners can compare and trust them. Both are <em>classes</em>, so the join is an OWL axiom rather than a SKOS match — and it is the strong one. CEDS v14 took its definition of Credential Definition from ceterms:Credential word for word, and alongside its own legacy type codes carries a CTDL-derived list — Badge, Certification, Degree, License, Micro Credential — taken from CTDL’s subclasses. Identical definitions earn owl:equivalentClass; had CEDS narrowed the idea, rdfs:subClassOf would be the honest claim. The registrar’s credential records can now be read in the registry’s terms.' },
+  { id:'r5', a:'edu_comp', b:'ctdl_comp', best:'eqclass',
+    scenario:'EDUcore keeps a forged copy of every standard it ingests. A competency query that starts inside EDUcore should land on the registry’s own class.',
+    src:{ t:'Competency — as EDUcore holds it', d:'EDUcore’s forged node for CTDL-ASN’s Competency: native label kept, stableId ceasn:Competency, source CTDLASN.' },
     opts:[
-      { t:'Competency — what a credential attests', d:'The registry’s term for a demonstrable ability a credential can certify.', ok:true },
+      { t:'Competency — what a credential attests', d:'The registry’s term for a demonstrable ability a credential can certify — knowledge, skills and abilities alike.', ok:true },
       { t:'Credential',                             d:'The award itself — not the ability it attests.' },
       { t:'Certification',                          d:'One kind of credential — still not the ability.' },
     ],
-    thread:'The competency thread — the platform’s idea of a skill joined to the registry’s',
-    pair:'EduCOR ↔ CTDL',
-    triple:'educor:Skill rdfs:subClassOf ceasn:Competency .',
-    why:'CTDL-ASN describes competencies so a credential can say exactly what it attests — and its Competency spans knowledge, skills and abilities alike. Two classes again, so again an RDFS axiom: every skill the platform tracks is a competency in the registry’s sense, though not every competency is a skill. Aligned, while each keeps its own machinery.' },
-  { id:'r6', a:'edu_res', b:'sch_lr', best:'eqclass',
-    scenario:'The platform’s courses should be findable by anything that reads the open web.',
-    src:{ t:'Educational resource', d:'Any resource a learner can study — video, article, exercise.' },
+    thread:'The competency thread — EDUcore’s copy of a competency joined back to the registry’s',
+    pair:'EDUcore ↔ CTDL',
+    triple:'educore:Competency owl:equivalentClass ceasn:Competency .',
+    why:'EDUcore forges each standard into one Neo4j graph and keeps every node’s native identity — this one’s stableId is literally ceasn:Competency, from CTDL-ASN Release 20230929. Two classes with one definition — “assertions of academic, professional, occupational, vocational and life goals, outcomes, and standards, however labeled” — so the loom records owl:equivalentClass. EDUcore’s real cross-standard work happens elsewhere: EXACT_MATCH and CLOSE_MATCH edges from each element into CEDS hub tuples.' },
+  { id:'r6', a:'edu_lr', b:'sch_lr', best:'eqclass',
+    scenario:'Resources described through EDUcore should be findable by anything that reads the open web.',
+    src:{ t:'Learning Resource — as EDUcore holds it', d:'EDUcore’s forged CEDS class (C200228): a persistent resource that entails a learning activity or experience — video, article, exercise.' },
     opts:[
       { t:'Learning resource',                     d:'Anything persistent that carries learning value — the web’s term.', ok:true },
       { t:'Educational / occupational credential', d:'What you earn at the end — not what you study.' },
       { t:'Person',                                d:'The learner — not the material.' },
     ],
-    thread:'The resource thread — the platform’s study material joined to the web’s',
-    pair:'EduCOR ↔ schema.org',
-    triple:'educor:EducationalResource owl:equivalentClass\n    schema:LearningResource .',
-    why:'EduCOR was built on LRMI and schema.org, so here the two classes genuinely coincide — and because they are classes, the loom records owl:equivalentClass: every member of one is a member of the other. Every resource on the platform is now visible to anything that speaks schema.org.' },
+    thread:'The resource thread — EDUcore’s learning resource joined to the web’s',
+    pair:'EDUcore ↔ schema.org',
+    triple:'educore:LearningResource owl:equivalentClass\n    schema:LearningResource .',
+    why:'CEDS took its Learning Resource definition from LRMI word for word, and schema.org’s LearningResource is LRMI’s class as the web adopted it — so EDUcore’s forged copy and the web’s class genuinely coincide. Because they are classes, the loom records owl:equivalentClass: every member of one is a member of the other. Every resource described through EDUcore is now visible to anything that speaks schema.org.' },
 ];
 
 /* Act II — three federated queries */
@@ -417,18 +417,18 @@ const QUERIES = [
     title:'The diploma that speaks the registry’s language',
     text:'Maria’s diploma sits in the registrar’s records as a CEDS credential. An employer reads credentials in the public registry’s terms and wants to know what this kind of award attests. <b>Which of your threads lets one query read her record in the registry’s vocabulary?</b>',
     path:['ceds_course','ceds_cred','ctdl_cred'],
-    why:'The query hops: her course section → the CEDS credential it earned → across your rdfs:subClassOf thread → the CTDL credential the registry describes. Neither side changed a field.',
-    caveat:'Be precise about what this buys you. The thread aligns two <em>schemas</em>, so the query can ask “what kind of credential is this, and what does the registry say that kind attests?” It does <b>not</b> verify Maria’s particular diploma — that takes an issuer-signed credential, or an instance published in the registry by the issuer. Alignment makes the question askable; provenance answers it.' },
+    why:'The query hops: her course section → the CEDS credential award it earned → its Credential Definition → across your owl:equivalentClass thread → the CTDL credential the registry describes. Neither side changed a field.',
+    caveat:'Be precise about what this buys you. The thread aligns two <em>schemas</em> — CEDS’s Credential Definition and CTDL’s Credential both describe a <em>kind</em> of credential — so the query can ask “what kind of credential is this, and what does the registry say that kind attests?” It does <b>not</b> verify Maria’s particular diploma. That lives in CEDS’s Credential Award, a class the registry has no counterpart for, and takes an issuer-signed credential or an instance published in the registry by the issuer. Alignment makes the question askable; provenance answers it.' },
   { need:'r2',
     title:'The program that points to a paycheck',
     text:'Maria’s transcript shows a Computer Science program. A career counselor wants to show her the occupations it leads to — with wage and outlook data. <b>Which thread answers it?</b>',
     path:['ceds_course','ceds_cip','onet_dev'],
     why:'Her course sections roll up to the program of study, and your relatedMatch thread carries the query into O*NET’s “Software Developers” — where the wages and outlook live. One link, education to labour market, zero schema changes.' },
   { need:'r3',
-    title:'The recommender looks outward',
-    text:'The learning platform wants to recommend a course teaching a skill that <em>US employers</em> are asking for — demand data the platform itself doesn’t track. <b>Which thread powers the recommendation?</b>',
-    path:['edu_path','edu_python','onet_prog'],
-    why:'The learning path names the platform’s “Python” skill; your broadMatch thread joins it to O*NET’s “Programming”, where employer demand lives. The recommender just got smarter without adding one field to its own ontology.' },
+    title:'The crosswalk that asks for a paycheck',
+    text:'EDUcore already holds the NCES crosswalk: Maria’s Computer Science program (CIP 11.0701) sits one CLASSIFICATION_CROSSWALK edge from 26 occupations, Software Developers among them. The counselor wants to rank those occupations by median wage — data EDUcore does not store. <b>Which thread lets the query step out for it?</b>',
+    path:['edu_cip','edu_soc','onet_dev'],
+    why:'The query walks EDUcore’s own crosswalk from the program to SOC 15-1252, then rides your exactMatch thread into O*NET’s record of the same occupation — where the wages and outlook live. EDUcore stayed a graph of standards, the labour-market numbers stayed in O*NET, and the question got answered anyway.' },
 ];
 
 /* thresholds are fractions of the max score for the mode played */
@@ -818,13 +818,13 @@ function renderEnd(){
       </ul>
     </div>
     <div class="card" style="font-size:13px; color:var(--muted)">
-      <span class="eyebrow" style="display:block; margin-bottom:8px">If you know EDUcore</span>
-      EDUcore runs this same federation on a Neo4j property graph rather than an RDF triplestore: its <span style="font-family:var(--mono); color:var(--gold)">MAPS_TO</span> and <span style="font-family:var(--mono); color:var(--gold)">STRUCTURALLY_MAPS_TO</span> relationships carry what the SKOS matches and the OWL/RDFS axioms carry here. Different storage, same loom — concepts align to concepts, structure aligns to structure.
+      <span class="eyebrow" style="display:block; margin-bottom:8px">Inside EDUcore</span>
+      EDUcore — the fifth vocabulary on your graph — runs this same federation on a Neo4j property graph rather than an RDF triplestore. Every standard is forged in with its native identity kept. Each element then resolves to a CEDS hub tuple by an authored <span style="font-family:var(--mono); color:var(--gold)">EXACT_MATCH</span> or an inferred, scored <span style="font-family:var(--mono); color:var(--gold)">CLOSE_MATCH</span>; two elements that reach the same hub by EXACT_MATCH are equivalent, otherwise candidates. <span style="font-family:var(--mono); color:var(--gold)">SUBCLASS_OF</span> carries structure and <span style="font-family:var(--mono); color:var(--gold)">CLASSIFICATION_CROSSWALK</span> carries CIP→SOC. Different storage, same loom — concepts align to concepts, structure aligns to structure.
     </div>
     ${S.mode==='quick' ? `<button class="btn-primary" id="expand">Play the expanded loom — 6 joins · 3 queries</button>
     <button id="again" style="text-align:center">Weave the quick game again</button>`
     : `<button class="btn-primary" id="again">Weave again</button>`}
-    <p class="credits">Grounded in real vocabularies: <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://credreg.net/" target="_blank" rel="noopener">CTDL</a> · <a href="https://www.onetonline.org/" target="_blank" rel="noopener">O*NET</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · <a href="https://arxiv.org/abs/2107.05522" target="_blank" rel="noopener">EduCOR</a>, linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a> and <a href="https://www.w3.org/TR/owl2-overview/" target="_blank" rel="noopener">OWL</a>/RDFS. The CIP→SOC crosswalk is real and published by NCES. Nothing here is saved — close the tab and the loom forgets you.</p>`;
+    <p class="credits">Grounded in real vocabularies: <a href="https://ceds.ed.gov/" target="_blank" rel="noopener">CEDS</a> · <a href="https://credreg.net/" target="_blank" rel="noopener">CTDL</a> · <a href="https://www.onetonline.org/" target="_blank" rel="noopener">O*NET</a> · <a href="https://schema.org/" target="_blank" rel="noopener">schema.org</a> · EDUcore (the education standards knowledge graph), linked with <a href="https://www.w3.org/TR/skos-reference/" target="_blank" rel="noopener">SKOS</a> and <a href="https://www.w3.org/TR/owl2-overview/" target="_blank" rel="noopener">OWL</a>/RDFS. The CIP→SOC crosswalk is real and published by NCES. Nothing here is saved — close the tab and the loom forgets you.</p>`;
   const reset = mode => {
     Object.assign(S, { mode, score:0, shownScore:0, richness:0,
       roundIdx:0, act2Score:0, bestCount:0, queryIdx:0, act3Score:0, queryRight:0,

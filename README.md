@@ -5,7 +5,7 @@ always exist — and that's healthy — but RDF links (SKOS/OWL) let them behave
 living, richer graph.
 
 Play in two acts across five real US-focused vocabularies — CEDS and CTDL (the focus
-standards, underlined in gold on the graph) plus O*NET, schema.org, and EduCOR:
+standards, underlined in gold on the graph) plus O*NET, schema.org, and EDUcore:
 
 - **Prologue.** A brief read on why multiple ontologies exist (and always will), and how to play.
 - **Act I — The Weave.** Judge which term in another vocabulary each term joins to;
@@ -19,20 +19,29 @@ mapping properties (`skos:exactMatch`, `broadMatch`, `relatedMatch`) are defined
 between instances of `skos:Concept` — code-list and taxonomy entries such as a CIP
 program code or an O*NET skill. Ontology **classes and properties** take OWL/RDFS
 instead (`owl:equivalentClass`, `rdfs:subClassOf`, `owl:equivalentProperty`). So
-`ceds:Credential → ceterms:Credential` is an `rdfs:subClassOf` axiom, not a
-`skos:closeMatch`.
+`ceds:CredentialDefinition → ceterms:Credential` is an `owl:equivalentClass` axiom, not a
+`skos:exactMatch`. (CEDS v14 has no class named Credential; Credential Definition is its
+counterpart, defined in CTDL's own words.)
 
 The game is also explicit that **alignment is not verification**. A schema link makes a
 question askable across two systems; it says nothing about whether a particular learner's
 diploma is genuine. That takes an issuer-signed credential or an instance published in
 the registry by the issuer.
 
-### Relationship to EDUcore
+### EDUcore on the graph
 
-EDUcore runs the same federation on a Neo4j property graph rather than an RDF
-triplestore — its `MAPS_TO` and `STRUCTURALLY_MAPS_TO` relationships carry what the SKOS
-matches and the OWL/RDFS axioms carry here. Different storage, same principle: concepts
-align to concepts, structure aligns to structure. The game says this on the score screen.
+EDUcore, the education standards knowledge graph, is the fifth vocabulary. Its nodes in
+the game are real forged nodes from that graph: the O*NET-SOC occupation 15-1252, the
+CIP program 11.0701 (one `CLASSIFICATION_CROSSWALK` edge apart, per the NCES crosswalk),
+CTDL-ASN's `ceasn:Competency`, and CEDS's Learning Resource class (C200228). EDUcore runs
+the same federation on a Neo4j property graph rather than an RDF triplestore: each
+standard's elements resolve to CEDS hub tuples by authored `EXACT_MATCH` or inferred
+`CLOSE_MATCH` edges, `SUBCLASS_OF` carries structure, and `CLASSIFICATION_CROSSWALK`
+carries CIP→SOC. Different storage, same principle: concepts align to concepts, structure
+aligns to structure. The game says this on the score screen.
+
+The facts behind every join and query were checked against the live EDUcore graph via
+its MCP server (standards inventory, class definitions, crosswalk edges).
 
 The first play is a quick game (3 joins, 2 queries); the expanded loom (6 joins, 3 queries)
 unlocks from the score screen. Every visit and every replay deals a fresh random hand — which
@@ -69,6 +78,6 @@ branch root.
 
 [CEDS](https://ceds.ed.gov/) · [CTDL](https://credreg.net/) ·
 [O*NET](https://www.onetonline.org/) · [schema.org](https://schema.org/) ·
-[EduCOR](https://arxiv.org/abs/2107.05522) · [SKOS](https://www.w3.org/TR/skos-reference/) ·
+EDUcore · [SKOS](https://www.w3.org/TR/skos-reference/) ·
 [OWL](https://www.w3.org/TR/owl2-overview/).
 The CIP→SOC program-to-occupation crosswalk in the game is real, published by NCES.

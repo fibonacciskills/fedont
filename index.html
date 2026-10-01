@@ -425,7 +425,7 @@ const ROUNDS = [
     triple:'educore:soc_15-1252.00 skos:exactMatch\n    ctdlsoc:15-1252 .',
     why:'CTDL tags credentials with ceterms:occupationType, drawn from the same SOC list EDUcore forged this node from — same code, same classification, so the two concepts are interchangeable and the loom records skos:exactMatch. Occupation codes are entries in a classification rather than classes, which is why this is a SKOS match and not an OWL axiom. Every credential in the registry aimed at this job is now one hop from Maria’s program.' },
   { id:'r4', a:'ceds_cred', b:'ctdl_cred', best:'eqclass',
-    scenario:'Maria’s diploma lives in the registrar’s records. The public credential registry describes credentials so the whole market can trust and compare them.',
+    scenario:'Maria’s diploma is one award of a qualification the registrar has defined. The public credential registry describes credentials so the whole market can trust and compare them.',
     src:{ t:'Credential Definition', d:'CEDS’s class for a credential as defined — a qualification, achievement or quality used to indicate suitability — with US reporting fields.' },
     opts:[
       { t:'Credential — as the registry describes it', d:'A degree, badge or certificate, published for transparency and comparison.', ok:true },
@@ -465,10 +465,10 @@ const ROUNDS = [
 /* Act II — three federated queries */
 const QUERIES = [
   { need:'r4',
-    title:'The diploma that speaks the registry’s language',
-    text:'Maria’s diploma sits in the registrar’s records as a CEDS credential. An employer reads credentials in the public registry’s terms and wants to know what this kind of award attests. <b>Which of your threads lets one query read her record in the registry’s vocabulary?</b>',
+    title:'The definition that speaks the registry’s language',
+    text:'The registrar defines a qualification once and awards it many times over; Maria’s diploma is one of those awards. What the qualification <em>is</em> — what it requires, what it attests — lives in the definition, not in her copy of it. An employer reading the public registry wants exactly that: what does this kind of award attest? <b>Which of your threads lets one query read the registrar’s definition in the registry’s vocabulary?</b>',
     path:['ceds_course','ceds_cred','ctdl_cred'],
-    why:'The query hops: her course section → the CEDS credential award it earned → its Credential Definition → across your owl:equivalentClass thread → the CTDL credential the registry describes. Neither side changed a field.',
+    why:'The query hops: her course section → the Credential Definition those credits count toward → across your owl:equivalentClass thread → the credential the registry describes. Her particular diploma never has to move, and neither side changed a field.',
     caveat:'Be precise about what this buys you. The thread aligns two <em>schemas</em> — CEDS’s Credential Definition and CTDL’s Credential both describe a <em>kind</em> of credential — so the query can ask “what kind of credential is this, and what does the registry say that kind attests?” It does <b>not</b> verify Maria’s particular diploma. That lives in CEDS’s Credential Award, a class the registry has no counterpart for, and takes an issuer-signed credential or an instance published in the registry by the issuer. Alignment makes the question askable; provenance answers it.' },
   { need:'r2',
     title:'The program that points somewhere',
@@ -576,7 +576,7 @@ function nodePos(n, w, h, t){
 function draw(t){
   const dpr = devicePixelRatio||1;
   const w = cv.clientWidth, h = cv.clientHeight;
-  if (!w||!h) return;
+  if (!w||!h) return requestAnimationFrame(draw);
   if (cv.width!==w*dpr||cv.height!==h*dpr){ cv.width=w*dpr; cv.height=h*dpr; }
   cx.setTransform(dpr,0,0,dpr,0,0);
   cx.clearRect(0,0,w,h);
@@ -641,7 +641,7 @@ function draw(t){
 
   /* query pulse */
   if (S.pulse && !REDUCED){
-    const el = (t - S.pulse.t0)/1600;          // one hop per 1.6s
+    const el = Math.max(0, t - S.pulse.t0)/1600;   // one hop per 1.6s; t can predate t0 by a frame
     const total = S.pulse.path.length-1;
     const prog = el % (total+0.6);
     if ((t - S.pulse.t0) > 1600*(total+0.6)*2) S.pulse=null;

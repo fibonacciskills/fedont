@@ -35,7 +35,9 @@ matches and the OWL/RDFS axioms carry here. Different storage, same principle: c
 align to concepts, structure aligns to structure. The game says this on the score screen.
 
 The first play is a quick game (3 joins, 2 queries); the expanded loom (6 joins, 3 queries)
-unlocks from the score screen. No login, no persistence — score lives only in the tab.
+unlocks from the score screen. Every visit and every replay deals a fresh random hand — which
+joins and queries appear, their order, and the order of the answer buttons — so a room full of
+players won't all see the same quiz. No login, no persistence — score lives only in the tab.
 
 ## Run it
 

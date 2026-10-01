@@ -450,12 +450,29 @@ const S = {
   queryIdx:0, act3Score:0, queryRight:0,
   links:[],             // {a,b,pred,born}
   pulse:null,           // {path:[ids], t0}
+  rounds:[], queries:[],// this visit's randomly dealt hand (see dealGame)
 };
 
-const QUICK_ROUNDS  = ['r1','r2','r4'];
-const QUICK_QUERIES = ['r4','r2'];
-const activeRounds  = ()=> S.mode==='quick' ? ROUNDS.filter(r=>QUICK_ROUNDS.includes(r.id)) : ROUNDS;
-const activeQueries = ()=> S.mode==='quick' ? QUERIES.filter(q=>QUICK_QUERIES.includes(q.need)) : QUERIES;
+/* Every visit (and every replay) deals a fresh, randomly ordered hand, so a room full of
+   players won't all see the same joins, queries or button order. */
+const shuffle = arr => { const a=arr.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const QUICK_N_ROUNDS = 3, QUICK_N_QUERIES = 2;
+function dealGame(mode){
+  if (mode==='quick'){
+    /* pick the queries first, then make sure the threads they need get woven in Act I */
+    const queries = shuffle(QUERIES).slice(0, QUICK_N_QUERIES);
+    const needed  = queries.map(q=>q.need);
+    const extra   = shuffle(ROUNDS.filter(r=>!needed.includes(r.id))).slice(0, QUICK_N_ROUNDS-needed.length);
+    S.rounds  = shuffle(ROUNDS.filter(r=>needed.includes(r.id)).concat(extra));
+    S.queries = queries;
+  } else {
+    S.rounds  = shuffle(ROUNDS);
+    S.queries = shuffle(QUERIES);
+  }
+}
+const activeRounds  = ()=> S.rounds;
+const activeQueries = ()=> S.queries;
+dealGame(S.mode);
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -669,7 +686,7 @@ function renderAct2(){
   const A = activeRounds();
   const r = A[S.roundIdx];
   const cs = CLUSTERS[nodeById[r.a].c], ct = CLUSTERS[nodeById[r.b].c];
-  const order = [0,1,2].map(j=>(j+S.roundIdx)%3);
+  const order = shuffle(r.opts.map((_,i)=>i));
   panel.innerHTML = `
     <div>
       <span class="eyebrow">Act I · The weave</span>
@@ -726,11 +743,9 @@ function renderAct3(){
   actTag.textContent='ACT II · THE HARVEST';
   const AQ = activeQueries(), AR = activeRounds();
   const q = AQ[S.queryIdx];
-  /* option bridges: correct + 2 decoys, shuffled deterministically enough */
-  const decoys = AR.filter(r=>r.id!==q.need);
-  const picked = [AR.find(r=>r.id===q.need), decoys[(S.queryIdx*2)%decoys.length], decoys[(S.queryIdx*2+3)%decoys.length]];
-  /* rotate so the true thread isn't always the first button */
-  const opts = [0,1,2].map(j=>picked[(j+S.queryIdx)%3]);
+  /* option bridges: the true thread + 2 random decoys from this hand, in random order */
+  const decoys = shuffle(AR.filter(r=>r.id!==q.need)).slice(0,2);
+  const opts = shuffle([AR.find(r=>r.id===q.need), ...decoys]);
   panel.innerHTML = `
     <div>
       <span class="eyebrow">Act II · The harvest</span>
@@ -814,6 +829,7 @@ function renderEnd(){
     Object.assign(S, { mode, score:0, shownScore:0, richness:0,
       roundIdx:0, act2Score:0, bestCount:0, queryIdx:0, act3Score:0, queryRight:0,
       links:[], pulse:null });
+    dealGame(mode);
     buildMeter();
     renderAct2();
   };

@@ -706,14 +706,15 @@ function renderPrologue(){
   panel.innerHTML = `
     <div>
       <span class="eyebrow">Prologue · Why four maps?</span>
-      <h2>One territory. Four maps. Forever.</h2>
-      <p class="lede">Each vocabulary was drawn by a different community to answer that community’s own questions — the registrar (<b style="color:var(--ceds)">CEDS</b>) asks “did Maria earn the credits?”, the credential registry (<b style="color:#e58bab">CTDL</b>) asks “can an employer trust what her diploma claims?” A single merged mega-ontology would have to answer <em>everyone’s</em>, which is how it ends up answering no one’s. They will always exist — but RDF lets them point at each other.</p>
+      <h2>One student. Four systems.</h2>
+      <p class="lede">Follow Maria. Her school’s records system knows which courses she passed and what they counted for — that’s <b style="color:var(--ceds)">CEDS</b>. The certificate she walks away with is published to a registry, so an employer three states away can look up what it actually took to earn — that’s <b style="color:var(--ctdl)">CTDL</b>. Her program and the job she wants are each a code in a national list, and something has to know those two codes are related — that’s <b style="color:var(--educore)">EDUcore</b>. And when her profile and that job posting meet on the open web, they both speak <b style="color:var(--schema)">schema.org</b>.</p>
+      <p class="lede">Four systems, each very good at its own job, none of them going away. Merging them into one would just produce something nobody uses. So we don’t — we let them point at each other, and Maria’s transcript, her certificate and that job posting become one story instead of three.</p>
     </div>
     <div class="card" style="font-size:13.5px; color:var(--muted)">
       <span class="eyebrow" style="display:block; margin-bottom:8px">The one rule that matters</span>
-      <div><b style="color:var(--text)">Concepts</b> — entries in a code list, like a CIP program code or a SOC occupation — join with SKOS: <span style="font-family:var(--mono); color:var(--gold)">exactMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">broadMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">relatedMatch</span>.</div>
-      <div style="margin-top:6px"><b style="color:var(--text)">Classes and properties</b> — the structure itself, like <span style="font-family:var(--mono)">ceds:Credential</span> — join with OWL and RDFS: <span style="font-family:var(--mono); color:var(--gold)">equivalentClass</span>, <span style="font-family:var(--mono); color:var(--gold)">subClassOf</span>, <span style="font-family:var(--mono); color:var(--gold)">equivalentProperty</span>.</div>
-      <div style="margin-top:7px; color:#7d84a6">Reaching for a SKOS match between two classes is the most common way a published crosswalk goes subtly wrong. The loom won’t do it — and neither should you.</div>
+      <div>Some things are <b style="color:var(--text)">entries in a list</b> — a program code, an occupation code. Those join with SKOS: <span style="font-family:var(--mono); color:var(--gold)">exactMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">broadMatch</span>, <span style="font-family:var(--mono); color:var(--gold)">relatedMatch</span>.</div>
+      <div style="margin-top:6px">Some things are <b style="color:var(--text)">kinds of thing</b> — “a credential,” “a person.” Those join with OWL and RDFS: <span style="font-family:var(--mono); color:var(--gold)">equivalentClass</span>, <span style="font-family:var(--mono); color:var(--gold)">subClassOf</span>, <span style="font-family:var(--mono); color:var(--gold)">equivalentProperty</span>.</div>
+      <div style="margin-top:7px; color:#7d84a6">Mixing those two up is the most common way a published crosswalk goes quietly wrong. The loom won’t do it — and neither should you.</div>
     </div>
     <button class="btn-primary" id="toAct1">Pick up the golden thread → Act I</button>`;
   document.getElementById('toAct1').addEventListener('click', ()=>{ S.roundIdx=0; renderAct2(); });
